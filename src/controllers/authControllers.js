@@ -14,6 +14,8 @@ export async function signUpController(req, res) {
       [user_name, email, newPassword, profile_picture]
     );
 
+    
+
     res.sendStatus(201);
   } catch (err) {
     console.log(err);
