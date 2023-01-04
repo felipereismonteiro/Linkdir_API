@@ -34,7 +34,7 @@ export async function signInMiddleware(req, res, next) {
             return res.sendStatus(401);
         }
         
-        req.email = body.email
+        req.user = founded.rows[0];
         next();
     } catch (err) {
         res.send(err.details.map(d => d.message)).status(400);

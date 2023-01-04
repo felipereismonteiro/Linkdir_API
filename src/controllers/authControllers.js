@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { insertUser } from "../repositories/authRepository.js";
 
@@ -19,10 +19,15 @@ export async function signUpController(req, res) {
 
 export async function signInController(req, res) {
   try {
-    const email = req.email;
-    const token = jwt.sign({email}, process.env.SECRET_KEY, {expiresIn: 86400})
+    const email = req.user;
+    const { user_name, profile_picture } = req.user;
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, {
+      expiresIn: 86400,
+    });
 
-    res.send({token})
+    console.log(email);
+
+    res.send({ token, user_name, profile_picture });
   } catch (err) {
     res.send(err.message);
   }
