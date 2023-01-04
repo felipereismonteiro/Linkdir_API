@@ -19,6 +19,7 @@ function filterHashtags(str) {
       hashtags.push(hashtag);
     }
   }
+ 
   return hashtags;
 }
 
@@ -32,22 +33,16 @@ export function postHashtag(str) {
     return queryString;
   }
 
-  function buildQueryArray() {
-    const queryArray = filterHashtags(str).map((word) => word.replace("#", ""));
-
-    return queryArray;
-  }
-
-  return connectionDB.query(buildQueryString(), buildQueryArray());
+  return connectionDB.query(buildQueryString(), filterHashtags(str));
 }
 
 export function postHashTagsAndPostIds(array, postId) {
+
   function buildQueryArray() {
     const queryArray = [];
 
     array.forEach((object) => queryArray.push(postId, object.id));
 
-    console.log(queryArray, "array");
     return queryArray;
   }
 
@@ -61,7 +56,6 @@ export function postHashTagsAndPostIds(array, postId) {
     const queryString = `INSERT INTO posts_hashtags (post_id, hashtag_id) VALUES ${formattedIndexPositions.join(
       ", "
     )}`;
-    console.log(queryString, "string");
 
     return queryString;
   }
@@ -69,6 +63,19 @@ export function postHashTagsAndPostIds(array, postId) {
   return connectionDB.query(buildQueryString(), buildQueryArray());
 }
 
-const hashtagsRepository = { postHashtag, postHashTagsAndPostIds };
+export function getHashtagByName(str) {
+  function buildQueryString() {
+
+    const formattedIndexPositions = filterHashtags(str)
+      .map((word, index) => `($${index + 1})`)
+      .join(", ");
+
+    return `SELECT id FROM hashtags WHERE name IN (${formattedIndexPositions})`;
+  }
+
+  return connectionDB.query(buildQueryString(), filterHashtags(str));
+}
+
+const hashtagsRepository = { postHashtag, postHashTagsAndPostIds, getHashtagByName };
 
 export default hashtagsRepository;

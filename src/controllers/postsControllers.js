@@ -5,6 +5,7 @@ import postsRepository from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const { user_id, content, url } = req.body;
+  const existingHashtags = res.locals.existingHashtags;
 
   try {
     const { rows: postRows } = await postsRepository.createUser(
@@ -17,9 +18,14 @@ export async function createPost(req, res) {
     const { rows: hashtagsRows } = await hashtagsRepository.postHashtag(
       content
     );
+    let hashtagsIds = hashtagsRows;
 
-    await hashtagsRepository.postHashTagsAndPostIds(hashtagsRows, postId);
-    
+    if (existingHashtags !== undefined) {
+      hashtagsIds = [...hashtagsRows, ...existingHashtags];
+    }
+
+    await hashtagsRepository.postHashTagsAndPostIds(hashtagsIds, postId);
+
     res.sendStatus(201);
   } catch (err) {
     res.status(500).send(err.message);
