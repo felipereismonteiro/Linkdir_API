@@ -1,15 +1,24 @@
 import { connectionDB } from "../db/db.js";
 
 function filterHashtags(str) {
-  const hashtags = str
-    .split(" ")
-    .map((word) => word.trim())
-    .filter((word) => {
-      if (word[0] === "#") {
-        return true;
-      }
-    });
+  const hashtags = [];
 
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] !== "#") {
+      continue;
+    }
+    let hashtag = "";
+
+    for (let j = i + 1; j < str.length; j++) {
+      if (str[j].match(/[^a-zA-Z0-9ç]/g)) {
+        break;
+      }
+      hashtag += str[j];
+    }
+    if (hashtag !== "") {
+      hashtags.push(hashtag);
+    }
+  }
   return hashtags;
 }
 
