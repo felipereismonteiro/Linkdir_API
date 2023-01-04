@@ -17,6 +17,6 @@ export async function signUpMiddleware(req, res, next) {
         next();
     } catch(err) {
         console.log(err);
-        res.send(err.details.map(e => e.message));
+        res.status(401).send(err.details.map(e => e.message));
     }
 }
