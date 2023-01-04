@@ -19,7 +19,7 @@ function filterHashtags(str) {
       hashtags.push(hashtag);
     }
   }
- 
+
   return hashtags;
 }
 
@@ -37,7 +37,6 @@ export function postHashtag(str) {
 }
 
 export function postHashTagsAndPostIds(array, postId) {
-
   function buildQueryArray() {
     const queryArray = [];
 
@@ -65,17 +64,25 @@ export function postHashTagsAndPostIds(array, postId) {
 
 export function getHashtagByName(str) {
   function buildQueryString() {
-
     const formattedIndexPositions = filterHashtags(str)
       .map((word, index) => `($${index + 1})`)
       .join(", ");
 
     return `SELECT id FROM hashtags WHERE name IN (${formattedIndexPositions})`;
   }
-
+  console.log(buildQueryString());
   return connectionDB.query(buildQueryString(), filterHashtags(str));
 }
 
-const hashtagsRepository = { postHashtag, postHashTagsAndPostIds, getHashtagByName };
+export function getHashtags() {
+  return connectionDB.query(`SELECT * FROM hashtags`);
+}
+
+const hashtagsRepository = {
+  postHashtag,
+  postHashTagsAndPostIds,
+  getHashtagByName,
+  getHashtags,
+};
 
 export default hashtagsRepository;
