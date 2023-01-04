@@ -1,5 +1,6 @@
-import { connectionDB } from "../db/db.js";
 import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
+import { insertUser } from "../repositories/authRepository.js";
 
 export async function signUpController(req, res) {
   try {
@@ -7,18 +8,22 @@ export async function signUpController(req, res) {
 
     const newPassword = bcrypt.hashSync(password, 10);
 
-    console.log(newPassword);
-
-    await connectionDB.query(
-      `INSERT INTO users(user_name, email, password, profile_picture) VALUES($1, $2, $3, $4)`,
-      [user_name, email, newPassword, profile_picture]
-    );
-
-    
+    insertUser(user_name, email, newPassword, profile_picture);
 
     res.sendStatus(201);
   } catch (err) {
     console.log(err);
     res.send(err).status(401);
+  }
+}
+
+export async function signInController(req, res) {
+  try {
+    const email = req.email;
+    const token = jwt.sign({email}, process.env.SECRET_KEY, {expiresIn: 86400})
+
+    res.send({token})
+  } catch (err) {
+    res.send(err.message);
   }
 }
