@@ -41,8 +41,34 @@ export function postHashtag(str) {
   return connectionDB.query(buildQueryString(), buildQueryArray());
 }
 
-const hashtagsRepository = { postHashtag };
+export function postHashTagsAndPostIds(array, postId) {
+  function buildQueryArray() {
+    const queryArray = [];
+
+    array.forEach((object) => queryArray.push(postId, object.id));
+
+    console.log(queryArray, "array");
+    return queryArray;
+  }
+
+  function buildQueryString() {
+    const formattedIndexPositions = [];
+
+    for (let i = 0; i <= buildQueryArray().length - 2; i += 2) {
+      formattedIndexPositions.push(`($${i + 1}, $${i + 2})`);
+    }
+
+    const queryString = `INSERT INTO posts_hashtags (post_id, hashtag_id) VALUES ${formattedIndexPositions.join(
+      ", "
+    )}`;
+    console.log(queryString, "string");
+
+    return queryString;
+  }
+
+  return connectionDB.query(buildQueryString(), buildQueryArray());
+}
+
+const hashtagsRepository = { postHashtag, postHashTagsAndPostIds };
 
 export default hashtagsRepository;
-
-//
