@@ -62,7 +62,7 @@ export function postHashTagsAndPostIds(array, postId) {
   return connectionDB.query(buildQueryString(), buildQueryArray());
 }
 
-export function getHashtagByName(str) {
+export function getHashtagsByNames(str) {
   function buildQueryString() {
     const formattedIndexPositions = filterHashtags(str)
       .map((word, index) => `($${index + 1})`)
@@ -81,7 +81,7 @@ export function getHashtags() {
 const hashtagsRepository = {
   postHashtag,
   postHashTagsAndPostIds,
-  getHashtagByName,
+  getHashtagsByNames,
   getHashtags,
   filterHashtags
 };

@@ -8,7 +8,7 @@ export async function createPost(req, res) {
 
   const existingHashtags = res.locals.existingHashtags;
   const hashtags = res.locals.hashtags;
-
+  console.log(hashtags)
   try {
     const { rows: postRows } = await postsRepository.createPost(
       user_id,
