@@ -23,9 +23,9 @@ function filterHashtags(str) {
   return hashtags;
 }
 
-export function postHashtag(str) {
+export function postHashtag(array) {
   function buildQueryString() {
-    const valuesPosition = filterHashtags(str)
+    const valuesPosition = array
       .map((word, index) => `($${index + 1})`)
       .join(", ");
     const queryString = `INSERT INTO hashtags (name) VALUES ${valuesPosition} ON CONFLICT (name) DO NOTHING RETURNING id`;
@@ -33,7 +33,7 @@ export function postHashtag(str) {
     return queryString;
   }
 
-  return connectionDB.query(buildQueryString(), filterHashtags(str));
+  return connectionDB.query(buildQueryString(), array);
 }
 
 export function postHashTagsAndPostIds(array, postId) {
@@ -62,20 +62,24 @@ export function postHashTagsAndPostIds(array, postId) {
   return connectionDB.query(buildQueryString(), buildQueryArray());
 }
 
-export function getHashtagsByNames(str) {
+export function getHashtagsByNames(array) {
   function buildQueryString() {
-    const formattedIndexPositions = filterHashtags(str)
+    const formattedIndexPositions = array
       .map((word, index) => `($${index + 1})`)
       .join(", ");
 
     return `SELECT id FROM hashtags WHERE name IN (${formattedIndexPositions})`;
   }
-  console.log(buildQueryString());
-  return connectionDB.query(buildQueryString(), filterHashtags(str));
+  console.log(buildQueryString(), array);
+  return connectionDB.query(buildQueryString(), array);
 }
 
 export function getHashtags() {
   return connectionDB.query(`SELECT * FROM hashtags`);
+}
+
+export function getOneHashTagByName(name) {
+  return connectionDB.query(`SELECT id FROM hashtags WHERE name=$1`, [name]);
 }
 
 const hashtagsRepository = {
@@ -83,7 +87,8 @@ const hashtagsRepository = {
   postHashTagsAndPostIds,
   getHashtagsByNames,
   getHashtags,
-  filterHashtags
+  filterHashtags,
+  getOneHashTagByName,
 };
 
 export default hashtagsRepository;
