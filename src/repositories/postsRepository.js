@@ -6,7 +6,7 @@ async function createPost(user_id, content, url) {
 }
 
 async function getPosts() {
-    return connectionDB.query("SELECT posts.*, users.user_name FROM posts JOIN users ON posts.user_id = users.id ORDER BY posts.id DESC LIMIT 20;")
+    return connectionDB.query("SELECT posts.*, users.user_name, users.profile_picture FROM posts JOIN users ON posts.user_id = users.id ORDER BY posts.id DESC LIMIT 20;")
 }
 
 const postsRepository = {

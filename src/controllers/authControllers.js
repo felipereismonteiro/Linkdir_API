@@ -19,13 +19,11 @@ export async function signUpController(req, res) {
 
 export async function signInController(req, res) {
   try {
-    const email = req.user;
+
     const {id, user_name, profile_picture } = req.user;
     const token = jwt.sign({ id }, process.env.SECRET_KEY, {
       expiresIn: 86400,
     });
-
-    console.log(email);
 
     res.send({ token, user: { user_name, profile_picture }});
   } catch (err) {
