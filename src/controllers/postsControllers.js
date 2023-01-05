@@ -15,37 +15,47 @@ export async function createPost(req, res) {
       content,
       url
     );
-    const postId = postRows[0].id;
 
-    if(hashtags) {
-        const { rows: hashtagsRows } = await hashtagsRepository.postHashtag(
-            content
-          );
-    
-          let hashtagsIds = hashtagsRows;
-      
-          if (existingHashtags !== undefined) {
-            hashtagsIds = [...hashtagsRows, ...existingHashtags];
-          }
-      
-          await hashtagsRepository.postHashTagsAndPostIds(hashtagsIds, postId);     
+    if (hashtags.length !== 0) {
+      const postId = postRows[0].id;
+
+      const { rows: hashtagsRows } = await hashtagsRepository.postHashtag(
+        hashtags
+      );
+
+      let hashtagsIds = hashtagsRows;
+
+      if (existingHashtags !== undefined) {
+        hashtagsIds = [...hashtagsRows, ...existingHashtags];
+      }
+
+      await hashtagsRepository.postHashTagsAndPostIds(hashtagsIds, postId);
     }
-  
-      res.sendStatus(201);
-    } catch (err) {
-        console.log(err.message)
-      res.status(500).send(err.message);
-    }
+
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send(err.message);
   }
-
-
-export async function getPosts(req, res) {
-
-    try {
-        const posts = await postsRepository.getPosts();
-        res.status(200).send(posts.rows);
-    } catch(err) {
-        res.status(500).send(err.message) 
-    }
 }
 
+export async function getPosts(req, res) {
+  try {
+    const posts = await postsRepository.getPosts();
+    res.status(200).send(posts.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+export async function getPostsByHashtag(req, res) {
+  const hashtagId = res.locals.hashtagId;
+console.log(hashtagId)
+  try {
+    const posts = await postsRepository.getPostsByHashtag(hashtagId);
+
+    res.send(posts.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
