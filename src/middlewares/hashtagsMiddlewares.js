@@ -1,11 +1,13 @@
 import hashtagsRepository from "../repositories/hashtagsRepository.js";
 
-export async function hashtagExistenceValidation(req, res, next) {
+export async function hashtagAlreadyRegisteredValidation(req, res, next) {
   const { content } = req.body;
   const {name} = req.params
-  
+  console.log("validation")
   try {
     if (req.method === "POST") {
+
+      console.log("POOST")
       const hashtags = hashtagsRepository.filterHashtags(content);
 
       res.locals.hashtags = hashtags;
@@ -22,6 +24,7 @@ export async function hashtagExistenceValidation(req, res, next) {
 
       next();
     }
+  
   } catch (err) {
     res.status(500).send(err.message);
   }
