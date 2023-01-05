@@ -18,16 +18,18 @@ export async function signUpMiddleware(req, res, next) {
         next();
     } catch(err) {
         console.log(err);
-        res.status(401).send(err.details.map(e => e.message));
+        res.status(401).send(err.message);
     }
 }
 
 export async function signInMiddleware(req, res, next) {
     try {
         const body = req.body;
+        
         await signInSchema.validateAsync(body, {abortEarly: false})
     
         const founded = await connectionDB.query(`SELECT * FROM users WHERE email=$1`, [body.email]);
+  
         const { password } = founded.rows[0];
 
         if(!bcrypt.compareSync(body.password, password)) {
@@ -37,6 +39,6 @@ export async function signInMiddleware(req, res, next) {
         req.user = founded.rows[0];
         next();
     } catch (err) {
-        res.send(err.details.map(d => d.message)).status(400);
+        res.status(401).send(err.message);
     }
 }
