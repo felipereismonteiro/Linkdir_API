@@ -5,4 +5,3 @@ import { hashtagExistenceValidation } from "../middlewares/hashtagsMiddlewares.j
 export const hashtagsRouter = Router();
 
 hashtagsRouter.get("/hashtags", getHashtags);
-hashtagsRouter.get("/hashtags/:hashtag", hashtagExistenceValidation);

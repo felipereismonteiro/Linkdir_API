@@ -47,3 +47,15 @@ export async function getPosts(req, res) {
     res.status(500).send(err.message);
   }
 }
+
+export async function getPostsByHashtag(req, res) {
+  const hashtagId = res.locals.hashtagId;
+console.log(hashtagId)
+  try {
+    const posts = await postsRepository.getPostsByHashtag(hashtagId);
+
+    res.send(posts.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
