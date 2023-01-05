@@ -42,14 +42,9 @@ export async function createPost(req, res) {
 
 export async function getPosts(req, res) {
 
-  // urlMetadata("https://www.youtube.com/watch?v=LwJvZOSQWrE&ab_channel=ESPNBrasil").then(metadata => {
-  //   console.log(metadata.title);
-  //   console.log(metadata.description);
-  //   console.log(metadata.image);
-  // });
-
     try {
         const { rows } = await postsRepository.getPosts();
+        
         const postsPromises = rows.map(async (p) => {
           let post = {};
           await urlMetadata(p.url).then(metadata => {
@@ -63,8 +58,8 @@ export async function getPosts(req, res) {
           
           return post;
         })
+        
         const posts = await Promise.all(postsPromises) 
-
         res.status(200).send(posts); 
     } catch(err) {
         res.status(500).send(err.message) 
