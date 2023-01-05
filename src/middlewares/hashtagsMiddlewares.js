@@ -4,6 +4,14 @@ export async function hashtagExistenceValidation(req, res, next) {
   const { content } = req.body;
 
   try {
+    const hashtags = hashtagsRepository.filterHashtags(content);
+
+    if (hashtags.length === 0) {
+      return res
+        .status(422)
+        .send({ message: "At least one hashtag is required" });
+    }
+
     const { rows } = await hashtagsRepository.getHashtagByName(content);
 
     if (rows.length !== 0) {

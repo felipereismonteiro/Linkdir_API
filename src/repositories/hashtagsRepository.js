@@ -83,6 +83,7 @@ const hashtagsRepository = {
   postHashTagsAndPostIds,
   getHashtagByName,
   getHashtags,
+  filterHashtags
 };
 
 export default hashtagsRepository;
