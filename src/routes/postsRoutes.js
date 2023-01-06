@@ -5,10 +5,6 @@ import { validateDeletePost, validatePostSchema } from "../middlewares/postsMidd
 
 export const postsRouter = Router();
 
-<<<<<<< HEAD
-postsRouter.post("/posts", validatePostSchema, hashtagAlreadyRegisteredValidation, createPost);
-// postsRouter.post("/posts", validatePostSchema, createPost);
-=======
 postsRouter.post(
   "/posts",
   validatePostSchema,
@@ -16,7 +12,6 @@ postsRouter.post(
   createPost
 );
 
->>>>>>> main
 postsRouter.get("/posts", getPosts);
 postsRouter.get("/posts/:hashtag", hashtagExistenceValidation, getPostsByHashtag);
 postsRouter.delete("/posts/delete/:id", validateDeletePost, deletePostById)

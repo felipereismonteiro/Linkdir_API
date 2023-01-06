@@ -66,7 +66,7 @@ export async function getPosts(req, res) {
 
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
-console.log(hashtagId)
+
   try {
     const posts = await postsRepository.getPostsByHashtag(hashtagId);
 
