@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { insertUser } from "../repositories/authRepository.js";
 
+
 export async function signUpController(req, res) {
   try {
     const { user_name, email, password, profile_picture } = req.user;
