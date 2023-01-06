@@ -95,3 +95,16 @@ export async function patchPostById(req, res) {
    res.status(400).send(err.message); 
   }
 }
+
+export async function putPostById(req, res) {
+  try {
+    const idPost = req.params.id;
+    const { content, url } = req.update;
+
+    await postsRepository.updatePutPost(content, url, idPost);
+    res.sendStatus(200);
+  } catch (err) {
+   console.log(err);
+   res.status(400).send(err.message); 
+  }
+}

@@ -5,6 +5,7 @@ import {
   getPosts,
   getPostsByHashtag,
   patchPostById,
+  putPostById,
 } from "../controllers/postsControllers.js";
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
 import {
@@ -15,6 +16,7 @@ import {
   validateDeletePost,
   validatePatchPost,
   validatePostSchema,
+  validatePutPost,
 } from "../middlewares/postsMiddlewares.js";
 
 export const postsRouter = Router();
@@ -34,5 +36,21 @@ postsRouter.get(
   getPostsByHashtag
 );
 
-postsRouter.delete("/posts/delete/:id", tokenValidation, validateDeletePost, deletePostById);
-postsRouter.patch("/posts/update/:id", tokenValidation, validatePatchPost, patchPostById)
+postsRouter.delete(
+  "/posts/delete/:id",
+  tokenValidation,
+  validateDeletePost,
+  deletePostById
+);
+postsRouter.patch(
+  "/posts/update/:id",
+  tokenValidation,
+  validatePatchPost,
+  patchPostById
+);
+postsRouter.put(
+  "/posts/update/:id",
+  tokenValidation,
+  validatePutPost,
+  putPostById
+);
