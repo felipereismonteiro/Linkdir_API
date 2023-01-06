@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { insertUser } from "../repositories/authRepository.js";
 
-
 export async function signUpController(req, res) {
   try {
     const { user_name, email, password, profile_picture } = req.user;
@@ -20,13 +19,19 @@ export async function signUpController(req, res) {
 
 export async function signInController(req, res) {
   try {
-
-    const {id, user_name, profile_picture } = req.user;
+    const { id, user_name, profile_picture } = req.user;
     const token = jwt.sign({ id }, process.env.SECRET_KEY, {
       expiresIn: 86400,
     });
 
-    res.send({ token, user: { id, user_name, profile_picture }});
+    const userData = JSON.stringify({
+      token,
+      user: { id, user_name, profile_picture },
+    });
+
+    res.cookie('userData', userData);
+  
+    res.send({ token, user: { id, user_name, profile_picture } });
   } catch (err) {
     res.send(err.message);
   }

@@ -6,38 +6,54 @@ import { tokenValidation } from "./authMiddlewares.js";
 dotenv.config();
 
 export function validatePostSchema(req, res, next) {
+  const post = req.body;
+  const { error } = postsSchemma.validate(post, { abortEarly: false });
 
-    const post = req.body
-    const { error } = postsSchemma.validate(post, { abortEarly: false });
-    
-    if (error) {
-      const errors = error.details.map((detail) => detail.message);
-      return res.status(422).send({ errors });
-    }
+  if (error) {
+    const errors = error.details.map((detail) => detail.message);
+    return res.status(422).send({ errors });
+  }
 
-    next();
+  next();
 }
 
 export async function validateDeletePost(req, res, next) {
- try {
+  try {
     const postToDelete = Number(req.params.id);
     const decodedId = res.locals.userId;
 
-    const postToBeDeleted = await postsRepository.searchPost(postToDelete)
-    .catch(err => console.log(err));
+    const postToBeDeleted = await postsRepository
+      .searchPost(postToDelete)
+      .catch((err) => console.log(err));
 
     if (postToBeDeleted.rows.length === 0) {
       return res.sendStatus(404);
     }
 
     if (postToBeDeleted.rows[0].user_id !== decodedId) {
-      return res.status(401).send("You`re not the owner of this post")
+      return res.status(401).send("You`re not the owner of this post");
     }
 
-    req.id = postToDelete
-    next()
-  } catch(err) {
-  console.log(err.message)
-  res.send(err.message);
- }
+    req.id = postToDelete;
+    next();
+  } catch (err) {
+    console.log(err.message);
+    res.send(err.message);
+  }
+}
+
+export function postExistenceValidation(req, res, next) {
+  const { postId } = req.params;
+
+  try {
+    const { rowCount } = postsRepository.searchPost(postId);
+
+    if (rowCount === 0) {
+      return res.status(404).send({ message: "Post not found" });
+    }
+
+    return next();
+  } catch (err) {
+    res.send(err.message);
+  }
 }
