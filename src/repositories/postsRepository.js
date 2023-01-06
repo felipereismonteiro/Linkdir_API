@@ -20,10 +20,20 @@ function getPostsByHashtag(id) {
   );
 }
 
+function searchPost(id) {
+  return connectionDB.query(`SELECT * FROM posts WHERE id=$1`, [id])
+}
+
+function deletePost(id) {
+  return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+}
+
 const postsRepository = {
   createPost,
   getPosts,
   getPostsByHashtag,
+  searchPost,
+  deletePost
 };
 
 export default postsRepository;
