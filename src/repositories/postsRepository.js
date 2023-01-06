@@ -7,22 +7,32 @@ async function createPost(user_id, content, url, title, description, image) {
   );
 }
 
-async function getPosts() {
+async function getPosts(userId) {
   return connectionDB.query(
     `SELECT 
        posts.*, users.user_name, users.profile_picture,
-       COUNT(likes.post_id) as likes
+       COUNT(likes.post_id) AS likes,
+    CASE 
+      WHEN likes.user_id = $1 THEN true
+      ELSE false
+    END AS is_liked
     FROM 
-      posts JOIN likes ON likes.post_id = posts.id
+      posts 
     JOIN 
-      users ON posts.user_id = users.id
+      likes 
+    ON 
+      likes.post_id = posts.id
+    JOIN 
+      users 
+    ON 
+      posts.user_id = users.id
     GROUP BY 
-      posts.id, users.user_name, users.profile_picture
+      posts.id, users.user_name, users.profile_picture, likes.user_id
     ORDER BY 
       posts.id DESC 
     LIMIT 
       20;
-      `
+      `, [userId]
   );
 }
 

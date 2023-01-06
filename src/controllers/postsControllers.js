@@ -53,8 +53,9 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
+  const userId =  res.locals.userId;
   try {
-    const { rows } = await postsRepository.getPosts();
+    const { rows } = await postsRepository.getPosts(userId);
     res.status(200).send(rows);
   } catch (err) {
     console.log(err.message);

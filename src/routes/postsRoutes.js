@@ -29,7 +29,7 @@ postsRouter.post(
   createPost
 );
 
-postsRouter.get("/posts", getPosts);
+postsRouter.get("/posts", tokenValidation,getPosts);
 
 postsRouter.get(
   "/posts/:hashtag",
