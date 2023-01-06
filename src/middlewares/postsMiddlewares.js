@@ -45,8 +45,6 @@ export function validateDeletePost(req, res, next) {
       return res.status(401).send("You`re not the owner of this post")
     }
 
-    
-
     req.id = postToDelete
     next()
   });
