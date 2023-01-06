@@ -1,9 +1,9 @@
 import { connectionDB } from "../db/db.js";
 
-async function createPost(user_id, content, url) {
+async function createPost(user_id, content, url, title, description, image) {
   return connectionDB.query(
-    "INSERT INTO posts (user_id, content, url) VALUES($1, $2, $3) RETURNING id;",
-    [user_id, content, url]
+    "INSERT INTO posts (user_id, content, url, url_title, url_description, url_image) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;",
+    [user_id, content, url, title, description, image]
   );
 }
 
