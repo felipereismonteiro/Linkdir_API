@@ -61,7 +61,7 @@ export async function getPosts(req, res) {
   } catch(err) {
     console.log(err.message)
       res.status(500).send(err.message) 
-  }
+  } 
 }
 
 export async function getPostsByHashtag(req, res) {
