@@ -11,6 +11,7 @@ import {
   hashtagExistenceValidation,
 } from "../middlewares/hashtagsMiddlewares.js";
 import {
+  validateDeletePost,
   validatePostSchema,
 } from "../middlewares/postsMiddlewares.js";
 
@@ -30,4 +31,4 @@ postsRouter.get(
   hashtagExistenceValidation,
   getPostsByHashtag
 );
-postsRouter.delete("/posts/delete/:id", tokenValidation, deletePostById);
+postsRouter.delete("/posts/delete/:id", tokenValidation, validateDeletePost, deletePostById);
