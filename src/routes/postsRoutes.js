@@ -6,7 +6,9 @@ import {
   getPostsByHashtag,
   likePost,
 } from "../controllers/postsControllers.js";
+
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
+
 import {
   hashtagAlreadyRegisteredValidation,
   hashtagExistenceValidation,
@@ -28,11 +30,13 @@ postsRouter.post(
 );
 
 postsRouter.get("/posts", getPosts);
+
 postsRouter.get(
   "/posts/:hashtag",
   hashtagExistenceValidation,
   getPostsByHashtag
 );
+
 postsRouter.delete(
   "/posts/delete/:id",
   tokenValidation,
@@ -46,3 +50,5 @@ postsRouter.post(
   postExistenceValidation,
   likePost
 );
+
+

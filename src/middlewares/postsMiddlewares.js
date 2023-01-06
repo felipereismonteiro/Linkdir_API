@@ -42,11 +42,11 @@ export async function validateDeletePost(req, res, next) {
   }
 }
 
-export function postExistenceValidation(req, res, next) {
+export async function postExistenceValidation(req, res, next) {
   const { postId } = req.params;
 
   try {
-    const { rowCount } = postsRepository.searchPost(postId);
+    const { rowCount } = await postsRepository.searchPost(postId);
 
     if (rowCount === 0) {
       return res.status(404).send({ message: "Post not found" });

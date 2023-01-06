@@ -91,7 +91,7 @@ export async function likePost(req, res) {
   try {
     await postsRepository.insertLikeToPost(userId, postId);
 
-    res.send({ message: "Post successfully created" });
+    res.send({ message: "Post successfully liked" });
   } catch (err) {
     res.send(err.message);
   }
