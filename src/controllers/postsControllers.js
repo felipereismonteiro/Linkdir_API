@@ -1,3 +1,4 @@
+import { connectionDB } from "../db/db.js";
 import hashtagsRepository, {
   postHashTagsAndPostIds,
 } from "../repositories/hashtagsRepository.js";
@@ -57,5 +58,15 @@ console.log(hashtagId)
     res.send(posts.rows);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+}
+
+export async function deletePostById(req, res) {
+  try {
+    const id = req.id
+    await postsRepository.deletePost(id);
+    res.status(200).send("Deleted")
+  } catch (err) {
+    res.send(err.message);
   }
 }
