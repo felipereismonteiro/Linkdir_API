@@ -1,4 +1,3 @@
-import { connectionDB } from "../db/db.js";
 import hashtagsRepository, {
   postHashTagsAndPostIds,
 } from "../repositories/hashtagsRepository.js";
@@ -81,5 +80,18 @@ export async function deletePostById(req, res) {
     res.status(200).send("Deleted");
   } catch (err) {
     res.send(err.message);
+  }
+}
+
+export async function patchPostById(req, res) {
+  try {
+    const field = Object.keys(req.update)[1];
+    const { idPost, content } = req.update;
+
+    await postsRepository.updatePost(field ,content, idPost);
+    res.sendStatus(200);
+  } catch (err) {
+   console.log(err);
+   res.status(400).send(err.message); 
   }
 }

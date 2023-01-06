@@ -28,12 +28,17 @@ function deletePost(id) {
   return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
 
+function updatePost(field, content, id) {
+  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [content, id]);
+}
+
 const postsRepository = {
   createPost,
   getPosts,
   getPostsByHashtag,
   searchPost,
-  deletePost
+  deletePost,
+  updatePost
 };
 
 export default postsRepository;

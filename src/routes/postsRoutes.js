@@ -4,6 +4,7 @@ import {
   deletePostById,
   getPosts,
   getPostsByHashtag,
+  patchPostById,
 } from "../controllers/postsControllers.js";
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
 import {
@@ -12,6 +13,7 @@ import {
 } from "../middlewares/hashtagsMiddlewares.js";
 import {
   validateDeletePost,
+  validatePatchPost,
   validatePostSchema,
 } from "../middlewares/postsMiddlewares.js";
 
@@ -31,4 +33,6 @@ postsRouter.get(
   hashtagExistenceValidation,
   getPostsByHashtag
 );
+
 postsRouter.delete("/posts/delete/:id", tokenValidation, validateDeletePost, deletePostById);
+postsRouter.patch("/posts/update/:id", tokenValidation, validatePatchPost, patchPostById)
