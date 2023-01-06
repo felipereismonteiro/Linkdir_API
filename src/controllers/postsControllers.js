@@ -8,7 +8,6 @@ import urlMetadata from "url-metadata";
 export async function createPost(req, res) {
   const { content, url } = req.body;
   const user_id = res.locals.userId;
-   console.log(user_id)
   let title = "";
   let description = "";
   let image = "";
