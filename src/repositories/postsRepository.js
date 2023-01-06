@@ -21,11 +21,18 @@ function getPostsByHashtag(id) {
 }
 
 function searchPost(id) {
-  return connectionDB.query(`SELECT * FROM posts WHERE id=$1`, [id])
+  return connectionDB.query(`SELECT * FROM posts WHERE id=$1`, [id]);
 }
 
 function deletePost(id) {
   return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+}
+
+function insertLikeToPost(userId, postId) {
+  return connectionDB.query(
+    `INSERT INTO likes (user_id, post_id) VALUES ($1, $2)`,
+    [userId, postId]
+  );
 }
 
 const postsRepository = {
@@ -33,7 +40,8 @@ const postsRepository = {
   getPosts,
   getPostsByHashtag,
   searchPost,
-  deletePost
+  deletePost,
+  insertLikeToPost
 };
 
 export default postsRepository;
