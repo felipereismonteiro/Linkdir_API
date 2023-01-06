@@ -4,7 +4,8 @@ import hashtagsRepository, {
 import postsRepository from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
-  const { user_id, content, url } = req.body;
+  const { content, url } = req.body;
+  const user_id = res.locals.userId;
 
   const existingHashtags = res.locals.existingHashtags;
   const hashtags = res.locals.hashtags;
@@ -50,7 +51,7 @@ export async function getPosts(req, res) {
 
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
-console.log(hashtagId)
+  console.log(hashtagId);
   try {
     const posts = await postsRepository.getPostsByHashtag(hashtagId);
 

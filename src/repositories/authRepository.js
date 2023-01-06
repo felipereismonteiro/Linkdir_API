@@ -15,6 +15,13 @@ export async function insertUser(
         return err;
     }
 }
-export async function generateToken() {
 
+export async function getUserById(id){
+  return connectionDB.query(`SELECT * FROM users WHERE id=$1`,[id])
 }
+
+const authRepository = {
+    getUserById
+}
+
+export default authRepository;
