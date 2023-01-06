@@ -17,3 +17,27 @@ export function validatePostSchema(req, res, next) {
 
     next();
 }
+
+export async function validateDeletePost(req, res, next) {
+ try {
+    const postToDelete = Number(req.params.id);
+    const decodedId = res.locals.userId;
+
+    const postToBeDeleted = await postsRepository.searchPost(postToDelete)
+    .catch(err => console.log(err));
+
+    if (postToBeDeleted.rows.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    if (postToBeDeleted.rows[0].user_id !== decodedId) {
+      return res.status(401).send("You`re not the owner of this post")
+    }
+
+    req.id = postToDelete
+    next()
+  } catch(err) {
+  console.log(err.message)
+  res.send(err.message);
+ }
+}
