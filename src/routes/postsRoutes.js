@@ -11,6 +11,6 @@ postsRouter.post(
   hashtagAlreadyRegisteredValidation,
   createPost
 );
-// postsRouter.post("/posts", validatePostSchema, createPost);
+
 postsRouter.get("/posts", getPosts);
 postsRouter.get("/posts/:hashtag", hashtagExistenceValidation, getPostsByHashtag)
