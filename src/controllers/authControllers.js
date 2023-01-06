@@ -30,7 +30,7 @@ export async function signInController(req, res) {
     });
 
     res.cookie('userData', userData);
-  
+    console.log(res)
     res.send({ token, user: { id, user_name, profile_picture } });
   } catch (err) {
     res.send(err.message);

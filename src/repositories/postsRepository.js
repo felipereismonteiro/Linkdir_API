@@ -9,7 +9,20 @@ async function createPost(user_id, content, url, title, description, image) {
 
 async function getPosts() {
   return connectionDB.query(
-    "SELECT posts.*, users.user_name, users.profile_picture FROM posts JOIN users ON posts.user_id = users.id ORDER BY posts.id DESC LIMIT 20;"
+    `SELECT 
+       posts.*, users.user_name, users.profile_picture,
+       COUNT(likes.post_id) as likes
+    FROM 
+      posts JOIN likes ON likes.post_id = posts.id
+    JOIN 
+      users ON posts.user_id = users.id
+    GROUP BY 
+      posts.id, users.user_name, users.profile_picture
+    ORDER BY 
+      posts.id DESC 
+    LIMIT 
+      20;
+      `
   );
 }
 
@@ -41,7 +54,7 @@ const postsRepository = {
   getPostsByHashtag,
   searchPost,
   deletePost,
-  insertLikeToPost
+  insertLikeToPost,
 };
 
 export default postsRepository;
