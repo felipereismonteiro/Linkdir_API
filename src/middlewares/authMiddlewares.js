@@ -62,18 +62,22 @@ export function tokenValidation(req, res, next) {
   }
 
   jwt.verify(token, process.env.SECRET_KEY, async (error, decoded) => {
+
     if (error) {
       return res.status(401).send({ message: "Invalid token" });
     }
 
     try {
+        
       const { rowCount } = await authRepository.getUserById(decoded.id);
 
       if (rowCount === 0) {
         return res.status(404).send({ message: "User not found" });
       }
+
       res.locals.userId = decoded.id;
       return next();
+
     } catch (err) {
       return res.status(500).send(err.message);
     }

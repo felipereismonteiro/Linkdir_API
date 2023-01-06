@@ -1,9 +1,9 @@
 import { connectionDB } from "../db/db.js";
 
-async function createPost(user_id, content, url) {
+async function createPost(user_id, content, url, title, description, image) {
   return connectionDB.query(
-    "INSERT INTO posts (user_id, content, url) VALUES($1, $2, $3) RETURNING id;",
-    [user_id, content, url]
+    "INSERT INTO posts (user_id, content, url, url_title, url_description, url_image) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;",
+    [user_id, content, url, title, description, image]
   );
 }
 
@@ -20,10 +20,20 @@ function getPostsByHashtag(id) {
   );
 }
 
+function searchPost(id) {
+  return connectionDB.query(`SELECT * FROM posts WHERE id=$1`, [id])
+}
+
+function deletePost(id) {
+  return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+}
+
 const postsRepository = {
   createPost,
   getPosts,
   getPostsByHashtag,
+  searchPost,
+  deletePost
 };
 
 export default postsRepository;

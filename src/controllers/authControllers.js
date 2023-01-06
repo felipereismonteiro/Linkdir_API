@@ -25,7 +25,7 @@ export async function signInController(req, res) {
       expiresIn: 86400,
     });
 
-    res.send({ token, user: { user_name, profile_picture }});
+    res.send({ token, user: { id, user_name, profile_picture }});
   } catch (err) {
     res.send(err.message);
   }
