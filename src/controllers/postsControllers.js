@@ -1,4 +1,3 @@
-import { connectionDB } from "../db/db.js";
 import hashtagsRepository, {
   postHashTagsAndPostIds,
 } from "../repositories/hashtagsRepository.js";
