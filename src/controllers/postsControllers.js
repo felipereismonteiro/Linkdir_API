@@ -83,3 +83,16 @@ export async function deletePostById(req, res) {
     res.send(err.message);
   }
 }
+
+export async function likePost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  try {
+    await postsRepository.insertLikeToPost(userId, postId);
+
+    res.send({ message: "Post successfully created" });
+  } catch (err) {
+    res.send(err.message);
+  }
+}

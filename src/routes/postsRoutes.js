@@ -4,6 +4,7 @@ import {
   deletePostById,
   getPosts,
   getPostsByHashtag,
+  likePost,
 } from "../controllers/postsControllers.js";
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
 import {
@@ -42,5 +43,6 @@ postsRouter.delete(
 postsRouter.post(
   "/posts/like/:postId",
   tokenValidation,
-  postExistenceValidation
+  postExistenceValidation,
+  likePost
 );
