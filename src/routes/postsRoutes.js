@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   createPost,
   deletePostById,
@@ -6,6 +7,7 @@ import {
   getPostsByHashtag,
   likePost,
   patchPostById,
+  unlikePost,
 } from "../controllers/postsControllers.js";
 
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
@@ -31,7 +33,7 @@ postsRouter.post(
   createPost
 );
 
-postsRouter.get("/posts", tokenValidation,getPosts);
+postsRouter.get("/posts", tokenValidation, getPosts);
 
 postsRouter.get(
   "/posts/:hashtag",
@@ -60,5 +62,9 @@ postsRouter.patch(
   patchPostById
 );
 
-postsRouter.delete("/posts/unlike/:postId", tokenValidation, postExistenceValidation)
-
+postsRouter.delete(
+  "/posts/unlike/:postId",
+  tokenValidation,
+  postExistenceValidation,
+  unlikePost
+);

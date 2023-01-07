@@ -51,7 +51,7 @@ export async function postExistenceValidation(req, res, next) {
     if (rowCount === 0) {
       return res.status(404).send({ message: "Post not found" });
     }
-    req.id = postToDelete;
+    
     next();
   } catch (err) {
     console.log(err.message);
