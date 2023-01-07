@@ -2,7 +2,7 @@ import usersRepository from "../repositories/usersRepository.js";
 
 export async function getUsersByName(req, res) {
     const { name } = req.query;
-    console.log(name)
+    
     try {
         const users = await usersRepository.getUsersByName(name);
 
