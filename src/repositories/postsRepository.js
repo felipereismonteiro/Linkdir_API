@@ -10,29 +10,32 @@ async function createPost(user_id, content, url, title, description, image) {
 async function getPosts(userId) {
   return connectionDB.query(
     `SELECT 
-       posts.*, users.user_name, users.profile_picture,
-       COUNT(likes.post_id) AS likes,
+      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
+        jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
     CASE 
-      WHEN likes.user_id = $1 THEN true
-      ELSE false
-    END AS is_liked
+      WHEN $1 = ANY (array_agg(u.id)) THEN true
+      ELSE false 
+      END AS is_liked
     FROM 
-      posts 
-    JOIN 
-      likes 
-    ON 
-      likes.post_id = posts.id
+      posts
     JOIN 
       users 
     ON 
       posts.user_id = users.id
-    GROUP BY 
-      posts.id, users.user_name, users.profile_picture, likes.user_id
+    LEFT JOIN
+      likes
+    ON 
+      likes.post_id = posts.id
+    LEFT JOIN 
+      users AS u
+    ON
+      u.id = likes.user_id      
+    GROUP BY
+      posts.id, users.user_name, users.profile_picture 
     ORDER BY 
       posts.id DESC 
     LIMIT 
-      20;
-      `, [userId]
+      20;`,[userId]
   );
 }
 
@@ -68,3 +71,12 @@ const postsRepository = {
 };
 
 export default postsRepository;
+
+/* {
+  "content":"viagem",
+  "url":"https://www.youtube.com/watch?v=-0exw-9YJBo&list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm"
+} */
+
+/* j= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgsImlhdCI6MTY3MzEwMTg1MCwiZXhwIjoxNjczMTg4MjUwfQ.s9QI8DCHtxQcRi-HAyX3hFHI1Jpdj-PZZptlYTRt9Oc  */
+
+/* f = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTY3MzA0MDIwNiwiZXhwIjoxNjczMTI2NjA2fQ.Em9ThSE58yMSWrCicfd0EiQqt8Fj5-ROJaUUfy8IbSE */
