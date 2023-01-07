@@ -82,3 +82,29 @@ export async function deletePostById(req, res) {
     res.send(err.message);
   }
 }
+
+export async function patchPostById(req, res) {
+  try {
+    const field = Object.keys(req.update)[1];
+    const { idPost, content } = req.update;
+
+    await postsRepository.updatePost(field ,content, idPost);
+    res.sendStatus(200);
+  } catch (err) {
+   console.log(err);
+   res.status(400).send(err.message); 
+  }
+}
+
+export async function putPostById(req, res) {
+  try {
+    const idPost = req.params.id;
+    const { content, url } = req.update;
+
+    await postsRepository.updatePutPost(content, url, idPost);
+    res.sendStatus(200);
+  } catch (err) {
+   console.log(err);
+   res.status(400).send(err.message); 
+  }
+}
