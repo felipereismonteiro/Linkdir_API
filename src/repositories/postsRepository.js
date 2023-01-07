@@ -61,6 +61,14 @@ function insertLikeToPost(userId, postId) {
   );
 }
 
+function updatePost(field, content, id) {
+  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [content, id]);
+}
+
+function updatePutPost(content, url, id) {
+  return connectionDB.query(`UPDATE posts SET content=$1, url=$2 WHERE id=$3`, [content, url, id]); 
+}
+
 const postsRepository = {
   createPost,
   getPosts,
@@ -68,15 +76,10 @@ const postsRepository = {
   searchPost,
   deletePost,
   insertLikeToPost,
+  updatePost,
+  updatePutPost
 };
 
 export default postsRepository;
 
-/* {
-  "content":"viagem",
-  "url":"https://www.youtube.com/watch?v=-0exw-9YJBo&list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm"
-} */
 
-/* j= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgsImlhdCI6MTY3MzEwMTg1MCwiZXhwIjoxNjczMTg4MjUwfQ.s9QI8DCHtxQcRi-HAyX3hFHI1Jpdj-PZZptlYTRt9Oc  */
-
-/* f = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTY3MzA0MDIwNiwiZXhwIjoxNjczMTI2NjA2fQ.Em9ThSE58yMSWrCicfd0EiQqt8Fj5-ROJaUUfy8IbSE */
