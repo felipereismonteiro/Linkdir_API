@@ -130,7 +130,7 @@ export async function unlikePost(req, res) {
   try {
     await postsRepository.deleteLikeFromPost(userId, postId);
 
-    res.send({ message: "Post successfully deleted" });
+    res.send({ message: "Post successfully unliked" });
   } catch (err) {
     res.send(err.message);
   }
