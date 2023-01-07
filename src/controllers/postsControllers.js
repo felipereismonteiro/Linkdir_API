@@ -72,6 +72,18 @@ export async function getPostsByHashtag(req, res) {
   }
 }
 
+export async function getPostsByUserId(req, res) {
+  const { id } = req.params;
+
+  try {
+    const posts = await postsRepository.getPostsByUserId(id);
+
+    res.status(200).send(posts.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);

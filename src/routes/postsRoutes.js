@@ -30,6 +30,7 @@ postsRouter.post(
 );
 
 postsRouter.get("/posts", getPosts);
+
 postsRouter.get(
   "/posts/:hashtag",
   hashtagExistenceValidation,
