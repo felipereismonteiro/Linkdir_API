@@ -76,10 +76,10 @@ export async function getPostsByHashtag(req, res) {
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);
-
     await postsRepository.deletePost(postToDelete);
     res.status(200).send("Deleted");
   } catch (err) {
+    console.log(err)
     res.send(err.message);
   }
 }
@@ -102,20 +102,7 @@ export async function patchPostById(req, res) {
     const field = Object.keys(req.update)[1];
     const { idPost, content } = req.update;
 
-    await postsRepository.updatePost(field, content, idPost);
-    res.sendStatus(200);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err.message);
-  }
-}
-
-export async function putPostById(req, res) {
-  try {
-    const idPost = req.params.id;
-    const { content, url } = req.update;
-
-    await postsRepository.updatePutPost(content, url, idPost);
+    await postsRepository.updatePost(content, idPost);
     res.sendStatus(200);
   } catch (err) {
     console.log(err);

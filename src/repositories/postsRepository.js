@@ -52,7 +52,9 @@ function searchPost(id) {
 }
 
 function deletePost(id) {
-  return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+  const promisse1 = connectionDB.query(`DELETE FROM likes WHERE post_id=$1;`, [id]);
+  const promisse2 = connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+  return promisse2;
 }
 
 function insertLikeToPost(userId, postId) {
@@ -62,20 +64,12 @@ function insertLikeToPost(userId, postId) {
   );
 }
 
-function updatePost(field, content, id) {
-  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [
-    content,
-    id,
-  ]);
+function updatePost(content, id) {
+  const idPost = Number(id);
+  return connectionDB.query(`UPDATE posts SET content=$1 WHERE id=$2`, [content, idPost]);
+
 }
 
-function updatePutPost(content, url, id) {
-  return connectionDB.query(`UPDATE posts SET content=$1, url=$2 WHERE id=$3`, [
-    content,
-    url,
-    id,
-  ]);
-}
 
 function deleteLikeFromPost(userId, postId) {
   return connectionDB.query(
@@ -92,7 +86,6 @@ const postsRepository = {
   deletePost,
   insertLikeToPost,
   updatePost,
-  updatePutPost,
   deleteLikeFromPost,
 };
 
