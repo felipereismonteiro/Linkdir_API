@@ -76,8 +76,7 @@ export async function getPostsByHashtag(req, res) {
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);
-    const promisse = await postsRepository.deletePost(postToDelete);
-    console.log(promisse)
+    await postsRepository.deletePost(postToDelete);
     res.status(200).send("Deleted");
   } catch (err) {
     console.log(err)
