@@ -24,13 +24,7 @@ export async function signInController(req, res) {
       expiresIn: 86400,
     });
 
-    const userData = JSON.stringify({
-      token,
-      user: { id, user_name, profile_picture },
-    });
-
-    res.cookie('userData', userData);
-    console.log(res)
+    console.log(res);
     res.send({ token, user: { id, user_name, profile_picture } });
   } catch (err) {
     res.send(err.message);

@@ -55,7 +55,6 @@ postsRouter.post(
   likePost
 );
 
-
 postsRouter.patch(
   "/posts/update/:id",
   tokenValidation,
@@ -68,3 +67,5 @@ postsRouter.put(
   validatePutPost,
   putPostById
 );
+
+postsRouter.delete("/posts/unlike/:postId", tokenValidation, postExistenceValidation)

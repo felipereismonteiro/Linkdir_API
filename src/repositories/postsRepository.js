@@ -35,7 +35,8 @@ async function getPosts(userId) {
     ORDER BY 
       posts.id DESC 
     LIMIT 
-      20;`,[userId]
+      20;`,
+    [userId]
   );
 }
 
@@ -62,11 +63,25 @@ function insertLikeToPost(userId, postId) {
 }
 
 function updatePost(field, content, id) {
-  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [content, id]);
+  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [
+    content,
+    id,
+  ]);
 }
 
 function updatePutPost(content, url, id) {
-  return connectionDB.query(`UPDATE posts SET content=$1, url=$2 WHERE id=$3`, [content, url, id]); 
+  return connectionDB.query(`UPDATE posts SET content=$1, url=$2 WHERE id=$3`, [
+    content,
+    url,
+    id,
+  ]);
+}
+
+function deleteLikeFromPost(postId, userId) {
+  return connectionDB.query(
+    `DELETE FROM likes WHERE user_id=$1 AND post_id=$2`,
+    [userId, postId]
+  );
 }
 
 const postsRepository = {
@@ -77,9 +92,8 @@ const postsRepository = {
   deletePost,
   insertLikeToPost,
   updatePost,
-  updatePutPost
+  updatePutPost,
+  deleteLikeFromPost,
 };
 
 export default postsRepository;
-
-
