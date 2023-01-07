@@ -77,7 +77,7 @@ function updatePutPost(content, url, id) {
   ]);
 }
 
-function deleteLikeFromPost(postId, userId) {
+function deleteLikeFromPost(userId, postId) {
   return connectionDB.query(
     `DELETE FROM likes WHERE user_id=$1 AND post_id=$2`,
     [userId, postId]
