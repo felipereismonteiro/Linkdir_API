@@ -52,7 +52,9 @@ function searchPost(id) {
 }
 
 function deletePost(id) {
-  return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+  const promisse1 = connectionDB.query(`DELETE FROM likes WHERE post_id=$1;`, [id]);
+  const promisse2 = connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
+  return promisse2;
 }
 
 function insertLikeToPost(userId, postId) {
