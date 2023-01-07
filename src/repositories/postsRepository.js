@@ -28,12 +28,9 @@ function deletePost(id) {
   return connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
 
-function updatePost(field, content, id) {
-  return connectionDB.query(`UPDATE posts SET ${field}=$1 WHERE id=$2`, [content, id]);
-}
-
-function updatePutPost(content, url, id) {
-  return connectionDB.query(`UPDATE posts SET content=$1, url=$2 WHERE id=$3`, [content, url, id]); 
+function updatePost(content, id) {
+  const idPost = Number(id);
+  return connectionDB.query(`UPDATE posts SET content=$1 WHERE id=$2`, [content, idPost]);
 }
 
 const postsRepository = {
@@ -42,8 +39,7 @@ const postsRepository = {
   getPostsByHashtag,
   searchPost,
   deletePost,
-  updatePost,
-  updatePutPost
+  updatePost
 };
 
 export default postsRepository;
