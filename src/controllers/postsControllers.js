@@ -52,8 +52,9 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
+  const userId = res.locals.userId;
   try {
-    const { rows } = await postsRepository.getPosts();
+    const { rows } = await postsRepository.getPosts(userId);
     res.status(200).send(rows);
   } catch (err) {
     console.log(err.message);
@@ -83,6 +84,19 @@ export async function deletePostById(req, res) {
   }
 }
 
+export async function likePost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  try {
+    await postsRepository.insertLikeToPost(userId, postId);
+
+    res.send({ message: "Post successfully liked" });
+  } catch (err) {
+    res.send(err.message);
+  }
+}
+
 export async function patchPostById(req, res) {
   try {
     const { idPost, content } = req.update;
@@ -91,7 +105,7 @@ export async function patchPostById(req, res) {
     console.log(promisse);
     res.sendStatus(200);
   } catch (err) {
-   console.log(err);
-   res.status(400).send(err.message); 
+    console.log(err);
+    res.status(400).send(err.message);
   }
 }

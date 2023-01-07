@@ -4,14 +4,18 @@ import {
   deletePostById,
   getPosts,
   getPostsByHashtag,
+  likePost,
   patchPostById,
 } from "../controllers/postsControllers.js";
+
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
+
 import {
   hashtagAlreadyRegisteredValidation,
   hashtagExistenceValidation,
 } from "../middlewares/hashtagsMiddlewares.js";
 import {
+  postExistenceValidation,
   validateDeletePost,
   validatePatchPost,
   validatePostSchema
@@ -27,7 +31,8 @@ postsRouter.post(
   createPost
 );
 
-postsRouter.get("/posts", getPosts);
+postsRouter.get("/posts", tokenValidation,getPosts);
+
 postsRouter.get(
   "/posts/:hashtag",
   hashtagExistenceValidation,
@@ -40,9 +45,20 @@ postsRouter.delete(
   validateDeletePost,
   deletePostById
 );
+
+postsRouter.post(
+  "/posts/like/:postId",
+  tokenValidation,
+  postExistenceValidation,
+  likePost
+);
+
 postsRouter.patch(
   "/posts/update/:id",
   tokenValidation,
   validatePatchPost,
   patchPostById
 );
+
+postsRouter.delete("/posts/unlike/:postId", tokenValidation, postExistenceValidation)
+
