@@ -52,8 +52,9 @@ export async function createPost(req, res) {
 }
 
 export async function getPosts(req, res) {
+  const userId = res.locals.userId;
   try {
-    const { rows } = await postsRepository.getPosts();
+    const { rows } = await postsRepository.getPosts(userId);
     res.status(200).send(rows);
   } catch (err) {
     console.log(err.message);
@@ -87,9 +88,22 @@ export async function getPostsByUserId(req, res) {
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);
-
     await postsRepository.deletePost(postToDelete);
     res.status(200).send("Deleted");
+  } catch (err) {
+    console.log(err)
+    res.send(err.message);
+  }
+}
+
+export async function likePost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  try {
+    await postsRepository.insertLikeToPost(userId, postId);
+
+    res.send({ message: "Post successfully liked" });
   } catch (err) {
     res.send(err.message);
   }
@@ -100,23 +114,23 @@ export async function patchPostById(req, res) {
     const field = Object.keys(req.update)[1];
     const { idPost, content } = req.update;
 
-    await postsRepository.updatePost(field ,content, idPost);
+    await postsRepository.updatePost(content, idPost);
     res.sendStatus(200);
   } catch (err) {
-   console.log(err);
-   res.status(400).send(err.message); 
+    console.log(err);
+    res.status(400).send(err.message);
   }
 }
 
-export async function putPostById(req, res) {
-  try {
-    const idPost = req.params.id;
-    const { content, url } = req.update;
+export async function unlikePost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
 
-    await postsRepository.updatePutPost(content, url, idPost);
-    res.sendStatus(200);
+  try {
+    await postsRepository.deleteLikeFromPost(userId, postId);
+
+    res.send({ message: "Post successfully unliked" });
   } catch (err) {
-   console.log(err);
-   res.status(400).send(err.message); 
+    res.send(err.message);
   }
 }
