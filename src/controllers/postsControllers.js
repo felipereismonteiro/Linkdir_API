@@ -81,7 +81,7 @@ export async function getPostsByUserId(req, res) {
 
     res.status(200).send(posts.rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).send(err.message); 
   }
 }
 
@@ -91,7 +91,7 @@ export async function deletePostById(req, res) {
     await postsRepository.deletePost(postToDelete);
     res.status(200).send("Deleted");
   } catch (err) {
-    console.log(err)
+    console.log(err.message)
     res.send(err.message);
   }
 }
@@ -117,7 +117,7 @@ export async function patchPostById(req, res) {
     await postsRepository.updatePost(content, idPost);
     res.sendStatus(200);
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     res.status(400).send(err.message);
   }
 }
