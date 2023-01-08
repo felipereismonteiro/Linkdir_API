@@ -47,6 +47,10 @@ function getPostsByHashtag(id) {
   );
 }
 
+function getPostsByUserId(id) {
+  return connectionDB.query("SELECT posts.*, users.user_name, users.profile_picture FROM posts JOIN users ON posts.user_id = users.id WHERE users.id = $1 ORDER BY posts.id DESC;", [id])
+}
+
 function searchPost(id) {
   return connectionDB.query(`SELECT * FROM posts WHERE id=$1`, [id]);
 }
@@ -82,6 +86,7 @@ const postsRepository = {
   createPost,
   getPosts,
   getPostsByHashtag,
+  getPostsByUserId,
   searchPost,
   deletePost,
   insertLikeToPost,
