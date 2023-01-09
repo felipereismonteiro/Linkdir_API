@@ -64,10 +64,24 @@ export async function getPosts(req, res) {
 
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
+  const userId = res.locals.userId;
+
   try {
-    const posts = await postsRepository.getPostsByHashtag(hashtagId);
+    const posts = await postsRepository.getPostsByHashtag(userId, hashtagId);
 
     res.send(posts.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+export async function getPostsByUserId(req, res) {
+  const { id } = req.params;
+  const userId = res.locals.userId;
+  try {
+    const posts = await postsRepository.getPostsByUserId(userId, id);
+
+    res.status(200).send(posts.rows);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -76,10 +90,14 @@ export async function getPostsByHashtag(req, res) {
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);
+
+    await postsRepository.deletePostLikeRelation(postToDelete);
+    await postsRepository.deletePostHashTagRelation(postToDelete);
     await postsRepository.deletePost(postToDelete);
+
     res.status(200).send("Deleted");
   } catch (err) {
-    console.log(err)
+    console.log(err.message);
     res.send(err.message);
   }
 }
@@ -99,13 +117,30 @@ export async function likePost(req, res) {
 
 export async function patchPostById(req, res) {
   try {
-    const field = Object.keys(req.update)[1];
     const { idPost, content } = req.update;
+    const existingHashtags = res.locals.existingHashtags;
+    const hashtags = res.locals.hashtags;
 
     await postsRepository.updatePost(content, idPost);
+    await postsRepository.deletePostHashTagRelation(idPost);
+
+    if (hashtags.length !== 0) {
+      const { rows: hashtagsRows } = await hashtagsRepository.postHashtag(
+        hashtags
+      );
+
+      let hashtagsIds = hashtagsRows;
+
+      if (existingHashtags !== undefined) {
+        hashtagsIds = [...hashtagsRows, ...existingHashtags];
+      }
+
+      await hashtagsRepository.postHashTagsAndPostIds(hashtagsIds, idPost);
+    }
+
     res.sendStatus(200);
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     res.status(400).send(err.message);
   }
 }
