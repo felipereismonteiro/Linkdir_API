@@ -20,7 +20,7 @@ import {
   postExistenceValidation,
   validateDeletePost,
   validatePatchPost,
-  validatePostSchema
+  validatePostSchema,
 } from "../middlewares/postsMiddlewares.js";
 
 export const postsRouter = Router();
@@ -60,6 +60,7 @@ postsRouter.patch(
   "/posts/update/:id",
   tokenValidation,
   validatePatchPost,
+  hashtagAlreadyRegisteredValidation,
   patchPostById
 );
 
