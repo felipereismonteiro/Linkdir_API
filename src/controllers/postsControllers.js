@@ -64,8 +64,10 @@ export async function getPosts(req, res) {
 
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
+  const userId = res.locals.userId;
+
   try {
-    const posts = await postsRepository.getPostsByHashtag(hashtagId);
+    const posts = await postsRepository.getPostsByHashtag(userId, hashtagId);
 
     res.send(posts.rows);
   } catch (err) {
@@ -75,13 +77,13 @@ export async function getPostsByHashtag(req, res) {
 
 export async function getPostsByUserId(req, res) {
   const { id } = req.params;
-  const userId =  res.locals.userId;
+  const userId = res.locals.userId;
   try {
     const posts = await postsRepository.getPostsByUserId(userId, id);
 
     res.status(200).send(posts.rows);
   } catch (err) {
-    res.status(500).send(err.message); 
+    res.status(500).send(err.message);
   }
 }
 
@@ -91,7 +93,7 @@ export async function deletePostById(req, res) {
     await postsRepository.deletePost(postToDelete);
     res.status(200).send("Deleted");
   } catch (err) {
-    console.log(err.message)
+    console.log(err.message);
     res.send(err.message);
   }
 }
