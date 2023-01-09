@@ -47,8 +47,37 @@ function getPostsByHashtag(id) {
   );
 }
 
-function getPostsByUserId(id) {
-  return connectionDB.query("SELECT posts.*, users.user_name, users.profile_picture FROM posts JOIN users ON posts.user_id = users.id WHERE users.id = $1 ORDER BY posts.id DESC;", [id])
+function getPostsByUserId(userId, id) {
+  return connectionDB.query(
+    `SELECT 
+      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
+        jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    CASE 
+      WHEN $1 = ANY (array_agg(u.id)) THEN true
+      ELSE false 
+      END AS is_liked
+    FROM 
+      posts
+    JOIN 
+      users 
+    ON 
+      posts.user_id = users.id
+    LEFT JOIN
+      likes
+    ON 
+      likes.post_id = posts.id
+    LEFT JOIN 
+      users AS u
+    ON
+      u.id = likes.user_id
+    WHERE
+        users.id = $2
+    GROUP BY
+      posts.id, users.user_name, users.profile_picture 
+    ORDER BY 
+      posts.id DESC 
+    ;`
+    , [userId,id])
 }
 
 function searchPost(id) {
