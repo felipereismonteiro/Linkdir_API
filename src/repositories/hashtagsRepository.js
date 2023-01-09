@@ -1,24 +1,8 @@
 import { connectionDB } from "../db/db.js";
 
 function filterHashtags(str) {
-  const hashtags = [];
-
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] !== "#") {
-      continue;
-    }
-    let hashtag = "";
-
-    for (let j = i + 1; j < str.length; j++) {
-      if (str[j].match(/[^a-zA-Z0-9ç]/g)) {
-        break;
-      }
-      hashtag += str[j];
-    }
-    if (hashtag !== "") {
-      hashtags.push(hashtag);
-    }
-  }
+  const array = str.match(/#[\wÀ-ÿ\d]+/g);
+  const hashtags = array.map((h) => h.replace("#", ""));
 
   return hashtags;
 }
@@ -74,7 +58,22 @@ export function getHashtagsByNames(array) {
 }
 
 export function getHashtags() {
-  return connectionDB.query(`SELECT * FROM hashtags`);
+  return connectionDB.query(
+    `SELECT 
+     hashtags.*, COUNT(posts_hashtags.hashtag_id) AS total_amount
+   FROM 
+    hashtags
+  JOIN 
+    posts_hashtags
+  ON
+    posts_hashtags.hashtag_id = hashtags.id
+  GROUP BY 
+     hashtags.id
+  ORDER BY
+    total_amount DESC
+  LIMIT 10
+   `
+  );
 }
 
 export function getOneHashTagByName(name) {

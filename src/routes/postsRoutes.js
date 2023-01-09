@@ -37,6 +37,7 @@ postsRouter.get("/posts", tokenValidation, getPosts);
 
 postsRouter.get(
   "/posts/:hashtag",
+  tokenValidation,
   hashtagExistenceValidation,
   getPostsByHashtag
 );
