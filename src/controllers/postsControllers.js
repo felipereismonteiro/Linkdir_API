@@ -75,9 +75,9 @@ export async function getPostsByHashtag(req, res) {
 
 export async function getPostsByUserId(req, res) {
   const { id } = req.params;
-
+  const userId =  res.locals.userId;
   try {
-    const posts = await postsRepository.getPostsByUserId(id);
+    const posts = await postsRepository.getPostsByUserId(userId, id);
 
     res.status(200).send(posts.rows);
   } catch (err) {
