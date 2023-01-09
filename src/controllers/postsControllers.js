@@ -5,6 +5,7 @@ import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
 
 export async function createPost(req, res) {
+  console.log("chegou no create")
   const { content, url } = req.body;
   const user_id = res.locals.userId;
   let title = "";
