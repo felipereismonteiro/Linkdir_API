@@ -5,7 +5,7 @@ import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
 
 export async function createPost(req, res) {
-  console.log("chegou no create")
+
   const { content, url } = req.body;
   const user_id = res.locals.userId;
   let title = "";
@@ -18,7 +18,7 @@ export async function createPost(req, res) {
     await urlMetadata(url).then((metadata) => {
       image = metadata.image;
       title = metadata.title;
-      description = metadata.description;
+      description = metadata.description; 
     });
 
     const { rows: postRows } = await postsRepository.createPost(
