@@ -75,7 +75,21 @@ export function getHashtagsByNames(array) {
 }
 
 export function getHashtags() {
-  return connectionDB.query(`SELECT * FROM hashtags`);
+  return connectionDB.query(
+  `SELECT 
+     hashtags.*, COUNT(posts_hashtags.hashtag_id) AS total_amount
+   FROM 
+    hashtags
+  JOIN 
+    posts_hashtags
+  ON
+    posts_hashtags.hashtag_id = hashtags.id
+  GROUP BY 
+     hashtags.id
+  ORDER BY
+    total_amount DESC
+  LIMIT 10
+   `);
 }
 
 export function getOneHashTagByName(name) {
