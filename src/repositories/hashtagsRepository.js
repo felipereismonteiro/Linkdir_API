@@ -70,7 +70,6 @@ export function getHashtagsByNames(array) {
 
     return `SELECT id FROM hashtags WHERE name IN (${formattedIndexPositions})`;
   }
-  console.log(buildQueryString(), array);
   return connectionDB.query(buildQueryString(), array);
 }
 

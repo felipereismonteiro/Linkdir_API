@@ -124,7 +124,7 @@ export async function patchPostById(req, res) {
 
 export async function unlikePost(req, res) {
   const { postId } = req.params;
-  const userId = res.locals.userId;
+  const userId = res.locals.userId; 
 
   try {
     await postsRepository.deleteLikeFromPost(userId, postId);
