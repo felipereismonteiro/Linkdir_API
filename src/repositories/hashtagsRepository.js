@@ -2,6 +2,11 @@ import { connectionDB } from "../db/db.js";
 
 function filterHashtags(str) {
   const array = str.match(/#[\wÀ-ÿ\d]+/g);
+
+  if (!array) {
+    return [];
+  }
+
   const hashtags = array.map((h) => h.replace("#", ""));
 
   return hashtags;
