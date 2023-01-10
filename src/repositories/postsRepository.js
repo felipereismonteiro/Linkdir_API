@@ -41,7 +41,6 @@ async function getPosts(userId) {
 }
 
 function getPostsByHashtag(userId, id) {
- 
   return connectionDB.query(
     ` SELECT 
     posts.*, users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
@@ -118,9 +117,6 @@ function searchPost(id) {
 }
 
 function deletePost(id) {
-  const promisse1 = connectionDB.query(`DELETE FROM likes WHERE post_id=$1;`, [
-    id,
-  ]);
   const promisse2 = connectionDB.query(`DELETE FROM posts WHERE id=$1`, [id]);
   return promisse2;
 }
@@ -147,6 +143,16 @@ function deleteLikeFromPost(userId, postId) {
   );
 }
 
+function deletePostHashTagRelation(id) {
+  return connectionDB.query(`DELETE FROM posts_hashtags WHERE post_id = $1`, [
+    id,
+  ]);
+}
+
+function deletePostLikeRelation(id) {
+  return connectionDB.query(`DELETE FROM likes WHERE post_id = $1`, [id]);
+}
+
 const postsRepository = {
   createPost,
   getPosts,
@@ -157,6 +163,8 @@ const postsRepository = {
   insertLikeToPost,
   updatePost,
   deleteLikeFromPost,
+  deletePostHashTagRelation,
+  deletePostLikeRelation,
 };
 
 export default postsRepository;

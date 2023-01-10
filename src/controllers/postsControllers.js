@@ -91,7 +91,11 @@ export async function getPostsByUserId(req, res) {
 export async function deletePostById(req, res) {
   try {
     const postToDelete = Number(req.params.id);
+
+    await postsRepository.deletePostLikeRelation(postToDelete);
+    await postsRepository.deletePostHashTagRelation(postToDelete);
     await postsRepository.deletePost(postToDelete);
+
     res.status(200).send("Deleted");
   } catch (err) {
     console.log(err.message);
@@ -114,10 +118,27 @@ export async function likePost(req, res) {
 
 export async function patchPostById(req, res) {
   try {
-    const field = Object.keys(req.update)[1];
     const { idPost, content } = req.update;
+    const existingHashtags = res.locals.existingHashtags;
+    const hashtags = res.locals.hashtags;
 
     await postsRepository.updatePost(content, idPost);
+    await postsRepository.deletePostHashTagRelation(idPost);
+
+    if (hashtags.length !== 0) {
+      const { rows: hashtagsRows } = await hashtagsRepository.postHashtag(
+        hashtags
+      );
+
+      let hashtagsIds = hashtagsRows;
+
+      if (existingHashtags !== undefined) {
+        hashtagsIds = [...hashtagsRows, ...existingHashtags];
+      }
+
+      await hashtagsRepository.postHashTagsAndPostIds(hashtagsIds, idPost);
+    }
+
     res.sendStatus(200);
   } catch (err) {
     console.log(err.message);
