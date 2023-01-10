@@ -10,32 +10,40 @@ async function createPost(user_id, content, url, title, description, image) {
 async function getPosts(userId) {
   return connectionDB.query(
     `SELECT 
-      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-        jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+      posts.*, u1.user_name, u1.profile_picture, COUNT (likes.post_id) AS likes, 
+      array_agg(jsonb_build_object('id', u2.id, 'user_name', u2.user_name)) AS liked_by,
+      array_agg(jsonb_build_object('user_id', u3.id, 'user_name', u3.user_name, 'user_picture', u3.profile_picture , 'comment', comments.comment)) AS comments,
     CASE 
-      WHEN $1 = ANY (array_agg(u.id)) THEN true
+      WHEN $1 = ANY (array_agg(u2.id)) THEN true
       ELSE false 
       END AS is_liked
     FROM 
       posts
     JOIN 
-      users 
+      users u1
     ON 
-      posts.user_id = users.id
+      posts.user_id = u1.id
     LEFT JOIN
       likes
     ON 
       likes.post_id = posts.id
-    LEFT JOIN 
-      users AS u
+    LEFT JOIN
+      comments
     ON
-      u.id = likes.user_id      
+      comments.post_id = posts.id
+    LEFT JOIN 
+      users AS u2
+    ON
+      u2.id = likes.user_id    
+    LEFT JOIN 
+      users AS u3
+    ON
+      comments.user_id = u3.id
     GROUP BY
-      posts.id, users.user_name, users.profile_picture 
+      posts.id, u1.user_name, u1.profile_picture 
     ORDER BY 
       posts.id DESC 
-    LIMIT 
-      20;`,
+    ;`,
     [userId]
   );
 }
@@ -43,8 +51,9 @@ async function getPosts(userId) {
 function getPostsByHashtag(userId, id) {
   return connectionDB.query(
     ` SELECT 
-    posts.*, users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-      jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    posts.*, users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, 
+    array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    array_agg(jsonb_build_object('comment', comments.comment)) AS comments,
   CASE 
     WHEN $1 = ANY (array_agg(u.id)) THEN true
     ELSE false 
@@ -63,6 +72,10 @@ function getPostsByHashtag(userId, id) {
     users AS u
   ON
     u.id = likes.user_id
+  LEFT JOIN
+    comments
+  ON
+    comments.post_id = posts.id
   JOIN 
     posts_hashtags
   ON 
