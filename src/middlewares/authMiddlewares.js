@@ -40,6 +40,10 @@ export async function signInMiddleware(req, res, next) {
       [body.email]
     );
 
+    if (founded.rows.length === 0) {
+      return res.status(404).send("User not founded");
+    }
+
     const { password } = founded.rows[0];
 
     if (!bcrypt.compareSync(body.password, password)) {
@@ -62,13 +66,11 @@ export function tokenValidation(req, res, next) {
   }
 
   jwt.verify(token, process.env.SECRET_KEY, async (error, decoded) => {
-
     if (error) {
       return res.status(401).send({ message: "Invalid token" });
     }
 
     try {
-        
       const { rowCount } = await authRepository.getUserById(decoded.id);
 
       if (rowCount === 0) {
