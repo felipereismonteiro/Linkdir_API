@@ -7,39 +7,6 @@ async function createPost(user_id, content, url, title, description, image) {
   );
 }
 
-// async function getPosts(userId) {
-//   return connectionDB.query(
-//     `SELECT 
-//       posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-//         jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
-//     CASE 
-//       WHEN $1 = ANY (array_agg(u.id)) THEN true
-//       ELSE false 
-//       END AS is_liked
-//     FROM 
-//       posts
-//     JOIN 
-//       users 
-//     ON 
-//       posts.user_id = users.id
-//     LEFT JOIN
-//       likes
-//     ON 
-//       likes.post_id = posts.id
-//     LEFT JOIN 
-//       users AS u
-//     ON
-//       u.id = likes.user_id      
-//     GROUP BY
-//       posts.id, users.user_name, users.profile_picture 
-//     ORDER BY 
-//       posts.id DESC 
-//     LIMIT 
-//       20;`,
-//     [userId]
-//   );
-// }
-
 async function getPosts(userId) {
   return connectionDB.query(
     `SELECT posts.id, posts.user_id, posts.content, posts.url, shares.created_at, posts.url_title, posts.url_description,
