@@ -1,5 +1,13 @@
 import { connectionDB } from "../db/db.js";
 
+function followUser(userId, userToFollowId) {
+  return connectionDB.query(
+    `INSERT INTO followers_followed (follower_id, followed_id) VALUES ($1, $2)`,
+    [userId, userToFollowId]
+  );
+}
+
+
 function getFollowStatus(userId, userPageId) {
   return connectionDB.query(
     `SELECT
@@ -19,6 +27,7 @@ function getFollowStatus(userId, userPageId) {
 
 const followRespository = {
   getFollowStatus,
+  followUser,
 };
 
 export default followRespository;

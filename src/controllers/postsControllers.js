@@ -6,7 +6,6 @@ import urlMetadata from "url-metadata";
 import followRepository from "../repositories/followRepository.js";
 
 export async function createPost(req, res) {
-
   const { content, url } = req.body;
   const user_id = res.locals.userId;
   let title = "";
@@ -19,7 +18,7 @@ export async function createPost(req, res) {
     await urlMetadata(url).then((metadata) => {
       image = metadata.image;
       title = metadata.title;
-      description = metadata.description; 
+      description = metadata.description;
     });
 
     const { rows: postRows } = await postsRepository.createPost(
@@ -82,9 +81,14 @@ export async function getPostsByUserId(req, res) {
   const userId = res.locals.userId;
   try {
     const posts = await postsRepository.getPostsByUserId(userId, id);
-    const followStatus = await followRepository.getFollowStatus(userId, id)
-    
-    res.status(200).send({is_followed:followStatus.rows[0].is_followed, posts: posts.rows});
+    const followStatus = await followRepository.getFollowStatus(userId, id);
+
+    res
+      .status(200)
+      .send({
+        is_followed: followStatus.rows[0].is_followed,
+        posts: posts.rows,
+      });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -150,7 +154,7 @@ export async function patchPostById(req, res) {
 
 export async function unlikePost(req, res) {
   const { postId } = req.params;
-  const userId = res.locals.userId; 
+  const userId = res.locals.userId;
 
   try {
     await postsRepository.deleteLikeFromPost(userId, postId);
