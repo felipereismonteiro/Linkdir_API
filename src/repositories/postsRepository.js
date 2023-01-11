@@ -9,34 +9,89 @@ async function createPost(user_id, content, url, title, description, image) {
 
 async function getPosts(userId) {
   return connectionDB.query(
-    `SELECT 
-      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-        jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    `SELECT posts.id, posts.user_id, posts.content, posts.url, shares.created_at, posts.url_title, posts.url_description,
+      posts.url_image, u1.user_name AS user_name, u1.profile_picture, u2.user_name AS shared_by, u2.id AS post_share_user,
+    'share' AS type,COUNT (shares.post_id) AS shares, COUNT (likes.post_id) AS likes, COUNT (comments.post_id) AS comments_amount,
+    array_agg(jsonb_build_object('id',u3.id, 'user_name', u3.user_name)) AS liked_by,
+    array_agg(jsonb_build_object('user_id', u4.id, 'user_name', u4.user_name, 'user_picture', u4.profile_picture , 'comment', comments.comment)) AS comments,
     CASE 
-      WHEN $1 = ANY (array_agg(u.id)) THEN true
+      WHEN $1 = ANY (array_agg(u3.id)) THEN true
       ELSE false 
       END AS is_liked
     FROM 
-      posts
+      shares 
     JOIN 
-      users 
+      posts 
     ON 
-      posts.user_id = users.id
-    LEFT JOIN
-      likes
+      shares.post_id = posts.id 
+    JOIN 
+      users u1 
+    ON 
+      posts.user_id = u1.id 
+    JOIN 
+      users u2 
+    ON 
+      shares.user_id = u2.id
+    LEFT JOIN 
+      likes 
     ON 
       likes.post_id = posts.id
     LEFT JOIN 
-      users AS u
+      users u3 
+    ON 
+      u3.id = likes.user_id
+    LEFT JOIN
+      comments
     ON
-      u.id = likes.user_id      
-    GROUP BY
-      posts.id, users.user_name, users.profile_picture 
-    ORDER BY 
-      posts.id DESC 
+      comments.post_id = posts.id
+    LEFT JOIN 
+      users u4
+    ON
+      comments.user_id = u4.id
+    GROUP BY 
+      posts.id, shares.created_at, u1.user_name, u1.profile_picture, u2.user_name, u2.id
+    UNION ALL 
+    SELECT 
+      posts.*, u1.user_name, u1.profile_picture, NULL AS shared_by, u1.id AS post_share_user,
+      'post' AS type, COUNT (shares.post_id) AS shares, COUNT (likes.post_id) AS likes, COUNT (comments.post_id) AS comments_amount,
+      array_agg(jsonb_build_object('id',u2.id, 'user_name', u2.user_name)) AS liked_by,
+      array_agg(jsonb_build_object('user_id', u3.id, 'user_name', u3.user_name, 'user_picture', u3.profile_picture , 'comment', comments.comment)) AS comments,
+      CASE 
+      WHEN $1 = ANY (array_agg(u2.id)) THEN true
+      ELSE false 
+      END AS is_liked
+    FROM 
+      posts 
+    JOIN 
+      users u1 
+    ON 
+      posts.user_id = u1.id
+    LEFT JOIN 
+      shares 
+    ON 
+      shares.post_id = posts.id 
+    LEFT JOIN 
+      likes 
+    ON 
+      likes.post_id = posts.id
+    LEFT JOIN 
+      users u2 
+    ON 
+      u2.id = likes.user_id
+    LEFT JOIN
+      comments
+    ON
+      comments.post_id = posts.id
+    LEFT JOIN 
+      users u3
+    ON
+      comments.user_id = u3.id
+    GROUP BY 
+      posts.id, u1.id, u1.user_name, u1.profile_picture 
+    ORDER BY created_at DESC 
     LIMIT 
       20;`,
-    [userId]
+    [userId] 
   );
 }
 

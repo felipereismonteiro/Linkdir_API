@@ -78,6 +78,7 @@ export function tokenValidation(req, res, next) {
       }
 
       res.locals.userId = decoded.id;
+
       return next();
     } catch (err) {
       return res.status(500).send(err.message);

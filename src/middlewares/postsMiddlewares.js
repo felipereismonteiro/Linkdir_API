@@ -37,7 +37,7 @@ export async function validateDeletePost(req, res, next) {
     req.id = postToDelete;
     next();
   } catch (err) {
-    console.log(err.message);
+    console.log(err.message)
     res.send(err.message);
   }
 }
