@@ -22,7 +22,6 @@ export async function signInController(req, res) {
     const { id, user_name, profile_picture } = req.user;
     const token = jwt.sign({ id }, process.env.SECRET_KEY);
 
-    console.log(res);
     res.send({ token, user: { id, user_name, profile_picture } });
   } catch (err) {
     res.send(err.message);

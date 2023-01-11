@@ -2,6 +2,11 @@ import { connectionDB } from "../db/db.js";
 
 function filterHashtags(str) {
   const array = str.match(/#[\wÀ-ÿ\d]+/g);
+
+  if (!array) {
+    return [];
+  }
+
   const hashtags = array.map((h) => h.replace("#", ""));
 
   return hashtags;
@@ -54,7 +59,6 @@ export function getHashtagsByNames(array) {
 
     return `SELECT id FROM hashtags WHERE name IN (${formattedIndexPositions})`;
   }
-  console.log(buildQueryString(), array);
   return connectionDB.query(buildQueryString(), array);
 }
 
