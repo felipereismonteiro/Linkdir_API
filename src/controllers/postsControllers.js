@@ -89,6 +89,7 @@ export async function getPostsByUserId(req, res) {
         is_followed: followStatus.rows[0].is_followed,
         posts: posts.rows,
       });
+      
   } catch (err) {
     res.status(500).send(err.message);
   }

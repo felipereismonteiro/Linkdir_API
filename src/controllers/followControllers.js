@@ -7,7 +7,7 @@ export async function followUser(req, res) {
   try {
     await followRespository.followUser(userId, userToFollowId);
 
-    res.sendStatus(200);
+    res.send(true);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -20,7 +20,7 @@ export async function unfollowUser(req, res) {
   try {
     await followRespository.unfollowUser(userId, userToFollowId);
 
-    res.sendStatus(200);
+    res.send(false);
   } catch (err) {
     res.status(500).send(err.message);
   }
