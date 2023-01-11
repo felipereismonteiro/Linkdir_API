@@ -84,7 +84,7 @@ export async function getPostsByUserId(req, res) {
     const posts = await postsRepository.getPostsByUserId(userId, id);
     const followStatus = await followRepository.getFollowStatus(userId, id)
     
-    res.status(200).send({followStatus:followStatus.rows[0], posts});
+    res.status(200).send({is_followed:followStatus.rows[0].is_followed, posts: posts.rows});
   } catch (err) {
     res.status(500).send(err.message);
   }
