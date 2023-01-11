@@ -1,17 +1,18 @@
 import hashtagsRepository from "../repositories/hashtagsRepository.js";
 
 export async function hashtagAlreadyRegisteredValidation(req, res, next) {
+  
   const { content } = req.body;
   
   try {
-    const hashtags = hashtagsRepository.filterHashtags(content);
 
+    const hashtags = hashtagsRepository.filterHashtags(content);
     res.locals.hashtags = hashtags;
     
     if (hashtags.length === 0) {
       return next();
     }
-
+    
     const { rows } = await hashtagsRepository.getHashtagsByNames(hashtags);
 
     if (rows.length !== 0) {
@@ -20,6 +21,7 @@ export async function hashtagAlreadyRegisteredValidation(req, res, next) {
     
     next();
   } catch (err) {
+    console.log(err.message)
     res.status(500).send(err.message);
   }
 }

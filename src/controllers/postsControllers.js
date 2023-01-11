@@ -3,6 +3,7 @@ import hashtagsRepository, {
 } from "../repositories/hashtagsRepository.js";
 import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
+import followRepository from "../repositories/followRepository.js";
 
 export async function createPost(req, res) {
   const { content, url } = req.body;
@@ -80,8 +81,14 @@ export async function getPostsByUserId(req, res) {
   const userId = res.locals.userId;
   try {
     const posts = await postsRepository.getPostsByUserId(userId, id);
+    const followStatus = await followRepository.getFollowStatus(userId, id);
 
-    res.status(200).send(posts.rows);
+    res
+      .status(200)
+      .send({
+        is_followed: followStatus.rows[0].is_followed,
+        posts: posts.rows,
+      });
   } catch (err) {
     res.status(500).send(err.message);
   }
