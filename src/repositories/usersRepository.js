@@ -21,6 +21,7 @@ export function getUsersByName(userId, name) {
             users.id
         ORDER BY 
             is_followed
+        DESC
         
         `,
     [userId, name]
