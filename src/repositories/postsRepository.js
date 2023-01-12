@@ -137,7 +137,7 @@ async function getPosts(userId) {
     ON
       shares_shares_cte.post_id = p1.id
     WHERE
-      u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
+      u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u2.id = $1
       GROUP BY 
         p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments
       UNION ALL
@@ -188,7 +188,7 @@ async function getPosts(userId) {
       ON
         comments.user_id = u3.id
     WHERE
-        u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
+        u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u1.id = $1
       GROUP BY 
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
       ORDER BY created_at DESC 
