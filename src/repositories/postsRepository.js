@@ -372,9 +372,11 @@ async function getPosts(userId) {
 
 function getPostsByHashtag(userId, id) {
   return connectionDB.query(
-    ` SELECT 
-    posts.*, users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-      jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    ` 
+  SELECT 
+    posts.*, users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, 
+    array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+    array_agg(jsonb_build_object('user_id', u4.id, 'user_name', u4.user_name, 'user_picture', u4.profile_picture , 'comment', comments.comment)) AS comments,
   CASE 
     WHEN $1 = ANY (array_agg(u.id)) THEN true
     ELSE false 
@@ -397,6 +399,14 @@ function getPostsByHashtag(userId, id) {
     posts_hashtags
   ON 
     posts.id = posts_hashtags.post_id
+  LEFT JOIN
+    comments
+  ON
+    comments.post_id = posts.id
+  LEFT JOIN 
+    users u4
+  ON
+    comments.user_id = u4.id
   WHERE
     posts_hashtags.hashtag_id = $2
   GROUP BY
@@ -411,8 +421,9 @@ function getPostsByHashtag(userId, id) {
 function getPostsByUserId(userId, id) {
   return connectionDB.query(
     `SELECT 
-      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, array_agg(
-        jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+      posts.*,users.user_name, users.profile_picture, COUNT (likes.post_id) AS likes, 
+      array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+      array_agg(jsonb_build_object('user_id', u4.id, 'user_name', u4.user_name, 'user_picture', u4.profile_picture , 'comment', comments.comment)) AS comments,
     CASE 
       WHEN $1 = ANY (array_agg(u.id)) THEN true
       ELSE false 
@@ -431,6 +442,14 @@ function getPostsByUserId(userId, id) {
       users AS u
     ON
       u.id = likes.user_id
+    LEFT JOIN
+      comments
+    ON
+      comments.post_id = posts.id
+    LEFT JOIN 
+      users u4
+    ON
+      comments.user_id = u4.id
     WHERE
         users.id = $2
     GROUP BY

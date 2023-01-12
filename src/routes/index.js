@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { authRouter } from "./authRoutes.js";
 import { commentsRoute } from "./commentsRoutes.js";
-import {hashtagsRouter} from "./hashtagsRoutes.js";
+import { followRoutes } from "./followRoutes.js";
+import { hashtagsRouter } from "./hashtagsRoutes.js";
 import { postsRouter } from "./postsRoutes.js";
 import { usersRouter } from "./usersRoutes.js";
 
@@ -11,3 +12,4 @@ router.use(postsRouter);
 router.use(hashtagsRouter);
 router.use(usersRouter);
 router.use(commentsRoute);
+router.use(followRoutes);
