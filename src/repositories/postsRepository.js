@@ -14,6 +14,9 @@ async function getPosts(userId) {
       FROM likes 
       GROUP BY post_id
     ),
+    accounts_followed_by_user_cte AS(
+       SELECT followed_id AS followed_account FROM followers_followed WHERE follower_id = $1   
+    ),
     liked_by_posts_cte AS (
       SELECT post_id, array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
       CASE 
@@ -33,7 +36,7 @@ async function getPosts(userId) {
       GROUP BY post_id
     ),
     comments_text_posts_cte AS (
-      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment)) AS comments
+      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
       FROM comments
       JOIN 
             users u 
@@ -70,7 +73,7 @@ async function getPosts(userId) {
       GROUP BY post_id
     ),
     comments_text_shares_cte AS (
-      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment)) AS comments
+      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
       FROM comments
       JOIN 
             users u 
@@ -132,7 +135,9 @@ async function getPosts(userId) {
     LEFT JOIN
     shares_shares_cte
     ON
-    shares_shares_cte.post_id = p1.id
+      shares_shares_cte.post_id = p1.id
+    WHERE
+      u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
       GROUP BY 
         p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments
       UNION ALL
@@ -182,24 +187,28 @@ async function getPosts(userId) {
         users u3
       ON
         comments.user_id = u3.id
+    WHERE
+        u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
       GROUP BY 
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
       ORDER BY created_at DESC 
       LIMIT 
         20;`,
-    [userId] 
+    [userId]
   );
 }
 
-
 function getPostsByHashtag(userId, id) {
   return connectionDB.query(
-   `
+    `
    WITH likes_posts_cte AS (
     SELECT post_id, COUNT(id) AS likes 
     FROM likes 
     GROUP BY post_id
   ),
+  accounts_followed_by_user_cte AS(
+    SELECT followed_id AS followed_account FROM followers_followed WHERE follower_id = $1   
+ ),
   liked_by_posts_cte AS (
     SELECT post_id, array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
     CASE 
@@ -219,7 +228,7 @@ function getPostsByHashtag(userId, id) {
     GROUP BY post_id
   ),
   comments_text_posts_cte AS (
-    SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment)) AS comments
+    SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
     FROM comments
     JOIN 
           users u 
@@ -298,6 +307,9 @@ function getPostsByUserId(userId, id) {
       FROM likes 
       GROUP BY post_id
     ),
+    accounts_followed_by_user_cte AS(
+      SELECT followed_id AS followed_account FROM followers_followed WHERE follower_id = $1   
+   ),
     liked_by_posts_cte AS (
       SELECT post_id, array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
       CASE 
@@ -317,7 +329,7 @@ function getPostsByUserId(userId, id) {
       GROUP BY post_id
     ),
     comments_text_posts_cte AS (
-      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment)) AS comments
+      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
       FROM comments
       JOIN 
             users u 
@@ -354,7 +366,7 @@ function getPostsByUserId(userId, id) {
       GROUP BY post_id
     ),
     comments_text_shares_cte AS (
-      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment)) AS comments
+      SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
       FROM comments
       JOIN 
             users u 
@@ -519,7 +531,10 @@ function deletePostLikeRelation(id) {
 }
 
 function sharePost(postId, userId) {
-  return connectionDB.query("INSERT INTO shares (post_id, user_id) VALUES ($1, $2);", [postId, userId])
+  return connectionDB.query(
+    "INSERT INTO shares (post_id, user_id) VALUES ($1, $2);",
+    [postId, userId]
+  );
 }
 
 const postsRepository = {

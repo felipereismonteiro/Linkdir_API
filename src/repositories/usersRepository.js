@@ -1,6 +1,7 @@
 import { connectionDB } from "../db/db.js";
 
 export function getUsersByName(userId, name) {
+
   return connectionDB.query(
     `SELECT 
             users.id, users.user_name, users.profile_picture,
@@ -11,7 +12,7 @@ export function getUsersByName(userId, name) {
                 END AS is_followed 
         FROM 
             users
-        JOIN
+        LEFT JOIN
             followers_followed
         ON
             followers_followed.follower_id = $1 

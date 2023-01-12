@@ -7,8 +7,11 @@ function followUser(userId, userToFollowId) {
   );
 }
 
-function unfollowUser(userId, userToUnfollowId){
-    return connectionDB.query(`DELETE FROM followers_followed WHERE follower_id = $1 AND followed_id = $2`, [userId, userToUnfollowId]);
+function unfollowUser(userId, userToUnfollowId) {
+  return connectionDB.query(
+    `DELETE FROM followers_followed WHERE follower_id = $1 AND followed_id = $2`,
+    [userId, userToUnfollowId]
+  );
 }
 
 function getFollowStatus(userId, userPageId) {
@@ -28,10 +31,27 @@ function getFollowStatus(userId, userPageId) {
   );
 }
 
+function getAccountsFollowedByUser(userId) {
+  return connectionDB.query(
+    `SELECT 
+        users.user_name 
+     FROM 
+        followers_followed
+     JOIN
+      users
+     ON 
+      followed_id = users.id
+     WHERE
+      follower_id = $1`,
+    [userId]
+  );
+}
+
 const followRespository = {
   getFollowStatus,
   followUser,
-  unfollowUser
+  unfollowUser,
+  getAccountsFollowedByUser
 };
 
 export default followRespository;
