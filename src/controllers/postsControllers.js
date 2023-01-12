@@ -55,8 +55,13 @@ export async function createPost(req, res) {
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
   try {
-    const { rows } = await postsRepository.getPosts(userId);
-    res.status(200).send(rows);
+    const { rows: posts } = await postsRepository.getPosts(userId);
+
+    const { rows: accounts_you_follow } =
+      await followRepository.getAccountsFollowedByUser(userId);
+
+    res.status(200).send({ accounts_you_follow, posts });
+    
   } catch (err) {
     console.log(err.message);
     res.status(500).send(err.message);
@@ -83,13 +88,10 @@ export async function getPostsByUserId(req, res) {
     const posts = await postsRepository.getPostsByUserId(userId, id);
     const followStatus = await followRepository.getFollowStatus(userId, id);
 
-    res
-      .status(200)
-      .send({
-        is_followed: followStatus.rows[0].is_followed,
-        posts: posts.rows,
-      });
-      
+    res.status(200).send({
+      is_followed: followStatus.rows[0].is_followed,
+      posts: posts.rows,
+    });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -170,13 +172,12 @@ export async function sharePost(req, res) {
   const { postId } = req.params;
   const userId = res.locals.userId;
 
-
   try {
-    await postsRepository.sharePost(postId, userId)
+    await postsRepository.sharePost(postId, userId);
 
     res.sendStatus(201);
   } catch (err) {
-    console.log(err.message)
-    res.send(err.message)
+    console.log(err.message);
+    res.send(err.message);
   }
 }
