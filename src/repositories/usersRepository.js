@@ -1,7 +1,6 @@
 import { connectionDB } from "../db/db.js";
 
 export function getUsersByName(userId, name) {
-
   return connectionDB.query(
     `SELECT 
             users.id, users.user_name, users.profile_picture,
@@ -29,8 +28,13 @@ export function getUsersByName(userId, name) {
   );
 }
 
+function getUserInfos(id) {
+  return connectionDB.query(`SELECT user_name, profile_picture FROM  users WHERE id=$1`, [id]);
+}
+
 const usersRepository = {
   getUsersByName,
+  getUserInfos,
 };
 
 export default usersRepository;

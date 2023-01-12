@@ -4,6 +4,7 @@ import hashtagsRepository, {
 import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
 import followRepository from "../repositories/followRepository.js";
+import usersRepository from "../repositories/usersRepository.js";
 
 export async function createPost(req, res) {
   const { content, url } = req.body;
@@ -61,7 +62,6 @@ export async function getPosts(req, res) {
       await followRepository.getAccountsFollowedByUser(userId);
 
     res.status(200).send({ accounts_you_follow, posts });
-    
   } catch (err) {
     console.log(err.message);
     res.status(500).send(err.message);
@@ -87,8 +87,10 @@ export async function getPostsByUserId(req, res) {
   try {
     const posts = await postsRepository.getPostsByUserId(userId, id);
     const followStatus = await followRepository.getFollowStatus(userId, id);
+    const userInfo = await usersRepository.getUserInfos(id);
 
     res.status(200).send({
+      userInfo: userInfo.rows[0],
       is_followed: followStatus.rows[0].is_followed,
       posts: posts.rows,
     });
