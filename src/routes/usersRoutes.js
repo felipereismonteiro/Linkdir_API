@@ -5,5 +5,5 @@ import { tokenValidation } from "../middlewares/authMiddlewares.js";
 
 export const usersRouter = Router();
 
-usersRouter.get("/users", getUsersByName);
+usersRouter.get("/users", tokenValidation, getUsersByName);
 usersRouter.get("/user/:id", tokenValidation, getPostsByUserId);
