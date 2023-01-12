@@ -158,3 +158,18 @@ export async function unlikePost(req, res) {
     res.send(err.message);
   }
 }
+
+export async function sharePost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+
+  try {
+    await postsRepository.sharePost(postId, userId)
+
+    res.sendStatus(201);
+  } catch (err) {
+    console.log(err.message)
+    res.send(err.message)
+  }
+}
