@@ -8,6 +8,7 @@ import {
   likePost,
   patchPostById,
   unlikePost,
+  sharePost
 } from "../controllers/postsControllers.js";
 
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
@@ -70,3 +71,8 @@ postsRouter.delete(
   postExistenceValidation,
   unlikePost
 );
+
+postsRouter.post("/posts/share/:postId",
+ tokenValidation, 
+ postExistenceValidation, 
+ sharePost);

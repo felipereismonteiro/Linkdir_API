@@ -21,7 +21,8 @@ export function getUsersByName(userId, name) {
         GROUP BY 
             users.id
         ORDER BY 
-            is_followed DESC
+            is_followed
+        DESC
         
         `,
     [userId, name]
