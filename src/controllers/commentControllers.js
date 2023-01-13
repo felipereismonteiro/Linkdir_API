@@ -1,6 +1,6 @@
-import commentsRepository from "../repositories/commentsRepository.js"
+import commentsRepository, { getComment } from "../repositories/commentsRepository.js"
 
-export default async function commentControllers(req, res) {
+export async function commentControllers(req, res) {
     try {
         const comment = res.comment;
 
@@ -9,6 +9,17 @@ export default async function commentControllers(req, res) {
         res.sendStatus(200);
     } catch(err) {
         console.log(err);
+        res.send(err.message);
+    }
+}
+
+export async function commentGetControllers(req, res) {
+    try {
+        const { userId } = res.locals;
+        const id = req.params;
+        const promisse = await getComment(id, userId);
+        res.send(promisse.rows);
+    } catch (err) {
         res.send(err.message);
     }
 }
