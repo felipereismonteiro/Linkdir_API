@@ -71,6 +71,24 @@ export async function getPosts(req, res) {
   }
 }
 
+export async function getOlderPosts(req, res) {
+  const userId = res.locals.userId;
+  const {page, timestamp} = req.query;
+  console.log(page)
+
+  try {
+    const { rows: posts } = await postsRepository.getOlderPosts(userId, page, timestamp);
+
+    const { rows: accounts_you_follow } =
+      await followRepository.getAccountsFollowedByUser(userId);
+
+    res.status(200).send({ accounts_you_follow, posts });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send(err.message);
+  }
+}
+
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
   const userId = res.locals.userId;
@@ -192,5 +210,18 @@ export async function sharePost(req, res) {
   } catch (err) {
     console.log(err.message);
     res.send(err.message);
+  }
+}
+
+export async function countNewPosts(req, res) {
+  const { timestamp } = req.params;
+  // const userId = res.locals.userId;
+
+  try {
+    const { rows } = await postsRepository.countNewPosts(timestamp)
+
+    res.status(200).send(rows[0]);
+  } catch(err) { 
+    res.status(500).send(err.message)
   }
 }
