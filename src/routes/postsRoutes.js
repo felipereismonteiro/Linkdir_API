@@ -9,7 +9,8 @@ import {
   patchPostById,
   unlikePost,
   sharePost,
-  countNewPosts
+  countNewPosts,
+  getOlderPosts
 } from "../controllers/postsControllers.js";
 
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
@@ -37,12 +38,16 @@ postsRouter.post(
 
 postsRouter.get("/posts", tokenValidation, getPosts);
 
+postsRouter.get("/posts/loadmore", tokenValidation, getOlderPosts);
+
 postsRouter.get(
   "/posts/:hashtag",
   tokenValidation,
   hashtagExistenceValidation,
   getPostsByHashtag
 );
+
+
 
 postsRouter.delete(
   "/posts/delete/:id",

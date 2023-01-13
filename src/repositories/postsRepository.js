@@ -200,6 +200,199 @@ async function getPosts(userId, page) {
   );
 }
 
+async function getOlderPosts(userId, page, timestamp) {
+  const limit = Number(page) * 10; 
+ 
+   return connectionDB.query(
+     `WITH likes_posts_cte AS (
+       SELECT post_id, COUNT(id) AS likes 
+       FROM likes 
+       GROUP BY post_id
+     ),
+     accounts_followed_by_user_cte AS(
+        SELECT followed_id AS followed_account FROM followers_followed WHERE follower_id = $1   
+     ),
+     liked_by_posts_cte AS (
+       SELECT post_id, array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+       CASE 
+           WHEN $1 = ANY (array_agg(u.id)) THEN true
+           ELSE false 
+           END AS is_liked
+       FROM likes
+       JOIN 
+             users u 
+         ON 
+             u.id = likes.user_id
+       GROUP BY likes.post_id
+     ),
+     comments_posts_cte AS (
+       SELECT post_id, COUNT(id) AS comments_amount
+       FROM comments
+       GROUP BY post_id
+     ),
+     comments_text_posts_cte AS (
+       SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
+       FROM comments
+       JOIN 
+             users u 
+         ON 
+             u.id = comments.user_id
+       GROUP BY comments.post_id
+     ),
+     shares_posts_cte AS (
+       SELECT post_id, COUNT(id) AS shares
+       FROM shares
+       GROUP BY post_id
+     ),
+     likes_shares_cte AS (
+       SELECT post_id, COUNT(id) AS likes 
+       FROM likes 
+       GROUP BY post_id
+     ),
+     liked_by_shares_cte AS (
+       SELECT post_id, array_agg(jsonb_build_object('id',u.id, 'user_name', u.user_name)) AS liked_by,
+       CASE 
+       WHEN $1 = ANY (array_agg(u.id)) THEN true
+       ELSE false 
+       END AS is_liked
+       FROM likes
+       JOIN 
+             users u 
+         ON 
+             u.id = likes.user_id
+       GROUP BY likes.post_id
+     ),
+     comments_shares_cte AS (
+       SELECT post_id, COUNT(id) AS comments_amount
+       FROM comments
+       GROUP BY post_id
+     ),
+     comments_text_shares_cte AS (
+       SELECT post_id, array_agg(jsonb_build_object('user_id', u.id, 'user_name', u.user_name, 'user_picture', u.profile_picture , 'comment', comments.comment, 'is_followed', CASE WHEN u.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) THEN true ELSE false END)) AS comments
+       FROM comments
+       JOIN 
+             users u 
+         ON 
+             u.id = comments.user_id
+       GROUP BY comments.post_id
+     ),
+     shares_shares_cte AS (
+       SELECT post_id, COUNT(id) AS shares
+       FROM shares
+       GROUP BY post_id
+     )
+     SELECT 'share' AS type, p1.id, p1.user_id, p1.content, p1.url, shares.created_at, p1.url_title, p1.url_description,
+         p1.url_image, u1.user_name AS user_name, u1.profile_picture, COALESCE(likes_shares_cte.likes, 0) AS likes, COALESCE(liked_by_shares_cte.liked_by, '{}') AS liked_by, COALESCE(liked_by_shares_cte.is_liked, false) AS is_liked,
+       COALESCE(comments_shares_cte.comments_amount, 0) AS comments_amount, COALESCE(comments_text_shares_cte.comments, '{}') AS comments,
+       COALESCE(shares_shares_cte.shares, 0) shares, u2.user_name AS shared_by, u2.id AS post_share_user, shares.id AS post_share_id
+       FROM 
+         shares 
+       JOIN 
+         posts p1 
+       ON 
+         shares.post_id = p1.id 
+       JOIN 
+         users u1 
+       ON 
+         p1.user_id = u1.id 
+       JOIN 
+         users u2 
+       ON 
+         shares.user_id = u2.id
+       LEFT JOIN 
+         likes 
+       ON 
+         likes.post_id = p1.id
+     LEFT JOIN
+         likes_shares_cte
+       ON
+         likes_shares_cte.post_id = p1.id
+     LEFT JOIN
+       liked_by_shares_cte
+     ON
+       liked_by_shares_cte.post_id = p1.id
+       LEFT JOIN
+         comments_shares_cte
+       ON
+         comments_shares_cte.post_id = p1.id
+     LEFT JOIN
+       comments_text_shares_cte
+     ON
+       comments_text_shares_cte.post_id = p1.id
+     LEFT JOIN
+         comments
+       ON
+         comments.post_id = p1.id
+       LEFT JOIN 
+         users u4
+       ON
+         comments.user_id = u4.id
+     LEFT JOIN
+     shares_shares_cte
+     ON
+       shares_shares_cte.post_id = p1.id
+     WHERE
+       (u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u2.id = $1) AND p1.created_at < to_timestamp( $3, 'YYYY-MM-DD"T"HH24:MI:SS.MS' ) 
+       GROUP BY 
+         p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments
+       UNION ALL
+       SELECT 
+         'post' AS type, p1.*, u1.user_name, u1.profile_picture, COALESCE(likes_posts_cte.likes, 0) AS likes, COALESCE(liked_by_posts_cte.liked_by, '{}') AS liked_by, COALESCE(liked_by_posts_cte.is_liked, false) AS is_liked,
+       COALESCE(comments_posts_cte.comments_amount, 0) AS comments_amount, COALESCE(comments_text_posts_cte.comments, '{}') AS comments, COALESCE(shares_posts_cte.shares, 0) AS shares, NULL AS shared_by,
+       u1.id AS post_share_user, p1.id AS post_share_id 
+       FROM 
+         posts p1 
+       JOIN 
+         users u1 
+       ON 
+         p1.user_id = u1.id
+       LEFT JOIN 
+         shares 
+       ON 
+         shares.post_id = p1.id
+     LEFT JOIN
+         shares_posts_cte
+       ON
+         shares_posts_cte.post_id = p1.id
+       LEFT JOIN 
+         likes 
+       ON 
+         likes.post_id = p1.id
+     LEFT JOIN
+         likes_posts_cte
+       ON
+         likes_posts_cte.post_id = p1.id
+     LEFT JOIN
+       liked_by_posts_cte
+     ON
+       liked_by_posts_cte.post_id = p1.id
+       LEFT JOIN
+         comments
+       ON
+         comments.post_id = p1.id
+     LEFT JOIN
+         comments_posts_cte
+       ON
+         comments_posts_cte.post_id = p1.id
+     LEFT JOIN
+       comments_text_posts_cte
+     ON
+       comments_text_posts_cte.post_id = p1.id
+       LEFT JOIN 
+         users u3
+       ON
+         comments.user_id = u3.id
+     WHERE
+         (u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u1.id = $1) AND p1.created_at < to_timestamp( $3, 'YYYY-MM-DD"T"HH24:MI:SS.MS' )  
+       GROUP BY 
+         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
+       ORDER BY created_at DESC 
+       LIMIT 
+         $2;`,
+     [userId, limit, timestamp]
+   );
+ }
+
 function getPostsByHashtag(userId, id, page) {
   const limit = Number(page) * 10;
 
@@ -564,7 +757,8 @@ const postsRepository = {
   deletePostHashTagRelation,
   deletePostLikeRelation,
   sharePost,
-  countNewPosts
+  countNewPosts,
+  getOlderPosts
 };
 
 export default postsRepository;
