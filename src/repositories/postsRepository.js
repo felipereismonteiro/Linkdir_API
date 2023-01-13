@@ -137,7 +137,7 @@ async function getPosts(userId) {
     ON
       shares_shares_cte.post_id = p1.id
     WHERE
-      u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
+      u2.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u2.id = $1
       GROUP BY 
         p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments
       UNION ALL
@@ -188,7 +188,7 @@ async function getPosts(userId) {
       ON
         comments.user_id = u3.id
     WHERE
-        u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte)
+        u1.id IN (SELECT followed_account FROM accounts_followed_by_user_cte) OR u1.id = $1
       GROUP BY 
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
       ORDER BY created_at DESC 
@@ -198,7 +198,10 @@ async function getPosts(userId) {
   );
 }
 
-function getPostsByHashtag(userId, id) {
+function getPostsByHashtag(userId, id, page) {
+  const offset = (Number(page) - 1) * 10;
+  const fetch = 10;
+
   return connectionDB.query(
     `
    WITH likes_posts_cte AS (
@@ -295,12 +298,17 @@ function getPostsByHashtag(userId, id) {
       posts_hashtags.hashtag_id = $2
   GROUP BY 
       p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
-  ORDER BY created_at DESC;`,
-    [userId, id]
+  ORDER BY created_at DESC
+  OFFSET $3 FETCH NEXT $4 ROWS ONLY
+  `,
+    [userId, id, offset, fetch]
   );
 }
 
-function getPostsByUserId(userId, id) {
+function getPostsByUserId(userId, id, page) {
+  const offset = (Number(page) - 1) * 10;
+  const fetch = 10;
+
   return connectionDB.query(
     `WITH likes_posts_cte AS (
       SELECT post_id, COUNT(id) AS likes 
@@ -379,7 +387,7 @@ function getPostsByUserId(userId, id) {
       FROM shares
       GROUP BY post_id
     )
-    SELECT 'share' AS type, p1.id, p1.user_id, p1.content, p1.url, shares.created_at, p1.url_title, p1.url_description,
+    (SELECT 'share' AS type, p1.id, p1.user_id, p1.content, p1.url, shares.created_at, p1.url_title, p1.url_description,
         p1.url_image, u1.user_name AS user_name, u1.profile_picture, COALESCE(likes_shares_cte.likes, 0) AS likes, COALESCE(liked_by_shares_cte.liked_by, '{}') AS liked_by, COALESCE(liked_by_shares_cte.is_liked, false) AS is_liked,
       COALESCE(comments_shares_cte.comments_amount, 0) AS comments_amount, COALESCE(comments_text_shares_cte.comments, '{}') AS comments,
       COALESCE(shares_shares_cte.shares, 0) shares, u2.user_name AS shared_by, u2.id AS post_share_user, shares.id AS post_share_id
@@ -432,9 +440,9 @@ function getPostsByUserId(userId, id) {
     WHERE
         u2.id = $2
     GROUP BY 
-        p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments
+        p1.id, shares.created_at, shares.id, u1.user_name, u1.profile_picture, u2.user_name, u2.id, likes_shares_cte.likes, comments_shares_cte.comments_amount, shares_shares_cte.shares, liked_by_shares_cte.liked_by, liked_by_shares_cte.is_liked, comments_text_shares_cte.comments)
     UNION ALL
-    SELECT
+    (SELECT
         'post' AS type, p1.*, u1.user_name, u1.profile_picture, COALESCE(likes_posts_cte.likes, 0) AS likes, COALESCE(liked_by_posts_cte.liked_by, '{}') AS liked_by, COALESCE(liked_by_posts_cte.is_liked, false) AS is_liked,
       COALESCE(comments_posts_cte.comments_amount, 0) AS comments_amount, COALESCE(comments_text_posts_cte.comments, '{}') AS comments, COALESCE(shares_posts_cte.shares, 0) AS shares, NULL AS shared_by,
       u1.id AS post_share_user, p1.id AS post_share_id 
@@ -484,8 +492,10 @@ function getPostsByUserId(userId, id) {
         u1.id = $2
     GROUP BY 
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
-    ORDER BY created_at DESC;`,
-    [userId, id]
+    ORDER BY created_at DESC)
+    OFFSET $3 FETCH NEXT $4 ROWS ONLY
+    ;`,
+    [userId, id, offset, fetch]
   );
 }
 

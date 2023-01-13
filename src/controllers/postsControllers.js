@@ -71,9 +71,10 @@ export async function getPosts(req, res) {
 export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
   const userId = res.locals.userId;
+  const {page} = req.query
 
   try {
-    const posts = await postsRepository.getPostsByHashtag(userId, hashtagId);
+    const posts = await postsRepository.getPostsByHashtag(userId, hashtagId, page);
 
     res.send(posts.rows);
   } catch (err) {
@@ -84,8 +85,12 @@ export async function getPostsByHashtag(req, res) {
 export async function getPostsByUserId(req, res) {
   const { id } = req.params;
   const userId = res.locals.userId;
+  const {page} = req.query
+
+  console.log(id)
+  console.log(page, "querrrrry")
   try {
-    const posts = await postsRepository.getPostsByUserId(userId, id);
+    const posts = await postsRepository.getPostsByUserId(userId, id, page);
     const followStatus = await followRepository.getFollowStatus(userId, id);
     const userInfo = await usersRepository.getUserInfos(id);
 
