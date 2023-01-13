@@ -198,7 +198,10 @@ async function getPosts(userId) {
   );
 }
 
-function getPostsByHashtag(userId, id) {
+function getPostsByHashtag(userId, id, page) {
+  const offset = (Number(page) - 1) * 10;
+  const fetch = 10;
+
   return connectionDB.query(
     `
    WITH likes_posts_cte AS (
@@ -295,8 +298,10 @@ function getPostsByHashtag(userId, id) {
       posts_hashtags.hashtag_id = $2
   GROUP BY 
       p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
-  ORDER BY created_at DESC;`,
-    [userId, id]
+  ORDER BY created_at DESC
+  OFFSET $3 FETCH NEXT $4 ROWS ONLY
+  `,
+    [userId, id, offset, fetch]
   );
 }
 
