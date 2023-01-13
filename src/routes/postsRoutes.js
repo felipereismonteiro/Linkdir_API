@@ -8,7 +8,8 @@ import {
   likePost,
   patchPostById,
   unlikePost,
-  sharePost
+  sharePost,
+  countNewPosts
 } from "../controllers/postsControllers.js";
 
 import { tokenValidation } from "../middlewares/authMiddlewares.js";
@@ -76,3 +77,6 @@ postsRouter.post("/posts/share/:postId",
  tokenValidation, 
  postExistenceValidation, 
  sharePost);
+
+
+ postsRouter.get("/posts/newafter/:timestamp",tokenValidation, countNewPosts)

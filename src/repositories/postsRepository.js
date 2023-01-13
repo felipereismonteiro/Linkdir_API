@@ -537,6 +537,10 @@ function sharePost(postId, userId) {
   );
 }
 
+function countNewPosts(timestamp, userId) {
+  return connectionDB.query(`SELECT COUNT(*) AS new_posts FROM posts WHERE created_at > to_timestamp( $1, 'YYYY-MM-DD"T"HH24:MI:SS.MS' )`, [timestamp])
+}
+
 const postsRepository = {
   createPost,
   getPosts,
@@ -550,6 +554,7 @@ const postsRepository = {
   deletePostHashTagRelation,
   deletePostLikeRelation,
   sharePost,
+  countNewPosts
 };
 
 export default postsRepository;

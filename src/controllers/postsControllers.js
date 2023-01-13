@@ -183,3 +183,16 @@ export async function sharePost(req, res) {
     res.send(err.message);
   }
 }
+
+export async function countNewPosts(req, res) {
+  const { timestamp } = req.params;
+  // const userId = res.locals.userId;
+
+  try {
+    const { rows } = await postsRepository.countNewPosts(timestamp)
+
+    res.status(200).send(rows[0]);
+  } catch(err) { 
+    res.status(500).send(err.message)
+  }
+}
