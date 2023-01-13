@@ -7,7 +7,9 @@ async function createPost(user_id, content, url, title, description, image) {
   );
 }
 
-async function getPosts(userId) {
+async function getPosts(userId, page) {
+ const limit = Number(page) * 10; 
+
   return connectionDB.query(
     `WITH likes_posts_cte AS (
       SELECT post_id, COUNT(id) AS likes 
@@ -193,14 +195,13 @@ async function getPosts(userId) {
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
       ORDER BY created_at DESC 
       LIMIT 
-        20;`,
-    [userId]
+        $2;`,
+    [userId, limit]
   );
 }
 
 function getPostsByHashtag(userId, id, page) {
-  const offset = (Number(page) - 1) * 10;
-  const fetch = 10;
+  const limit = Number(page) * 10;
 
   return connectionDB.query(
     `
@@ -299,15 +300,14 @@ function getPostsByHashtag(userId, id, page) {
   GROUP BY 
       p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
   ORDER BY created_at DESC
-  OFFSET $3 FETCH NEXT $4 ROWS ONLY
+  LIMIT $3
   `,
-    [userId, id, offset, fetch]
+    [userId, id, limit]
   );
 }
 
 function getPostsByUserId(userId, id, page) {
-  const offset = (Number(page) - 1) * 10;
-  const fetch = 10;
+  const limit = Number(page) * 10;
 
   return connectionDB.query(
     `WITH likes_posts_cte AS (
@@ -493,9 +493,9 @@ function getPostsByUserId(userId, id, page) {
     GROUP BY 
         p1.id, u1.id, u1.user_name, u1.profile_picture, likes_posts_cte.likes, comments_posts_cte.comments_amount, shares_posts_cte.shares, liked_by_posts_cte.liked_by, liked_by_posts_cte.is_liked, comments_text_posts_cte.comments
     ORDER BY created_at DESC)
-    OFFSET $3 FETCH NEXT $4 ROWS ONLY
+    LIMIT $3
     ;`,
-    [userId, id, offset, fetch]
+    [userId, id, limit]
   );
 }
 
