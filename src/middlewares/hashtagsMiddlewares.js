@@ -28,6 +28,7 @@ export async function hashtagAlreadyRegisteredValidation(req, res, next) {
 
 export async function hashtagExistenceValidation(req, res, next) {
   const { hashtag } = req.params;
+  console.log(hashtag)
 
   try {
     const { rows } = await hashtagsRepository.getOneHashTagByName(hashtag);

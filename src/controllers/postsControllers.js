@@ -55,8 +55,11 @@ export async function createPost(req, res) {
 
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
+  const {page} = req.query;
+  console.log(page)
+
   try {
-    const { rows: posts } = await postsRepository.getPosts(userId);
+    const { rows: posts } = await postsRepository.getPosts(userId, page);
 
     const { rows: accounts_you_follow } =
       await followRepository.getAccountsFollowedByUser(userId);
@@ -72,6 +75,8 @@ export async function getPostsByHashtag(req, res) {
   const hashtagId = res.locals.hashtagId;
   const userId = res.locals.userId;
   const {page} = req.query
+
+  console.log(page, hashtagId,"hashtag")
 
   try {
     const posts = await postsRepository.getPostsByHashtag(userId, hashtagId, page);
@@ -99,6 +104,7 @@ export async function getPostsByUserId(req, res) {
       is_followed: followStatus.rows[0].is_followed,
       posts: posts.rows,
     });
+
   } catch (err) {
     res.status(500).send(err.message);
   }
