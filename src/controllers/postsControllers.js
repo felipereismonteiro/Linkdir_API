@@ -56,7 +56,6 @@ export async function createPost(req, res) {
 export async function getPosts(req, res) {
   const userId = res.locals.userId;
   const {page} = req.query;
-  console.log(page)
 
   try {
     const { rows: posts } = await postsRepository.getPosts(userId, page);
@@ -74,7 +73,6 @@ export async function getPosts(req, res) {
 export async function getOlderPosts(req, res) {
   const userId = res.locals.userId;
   const {page, timestamp} = req.query;
-  console.log(page)
 
   try {
     const { rows: posts } = await postsRepository.getOlderPosts(userId, page, timestamp);
@@ -94,8 +92,6 @@ export async function getPostsByHashtag(req, res) {
   const userId = res.locals.userId;
   const {page} = req.query
 
-  console.log(page, hashtagId,"hashtag")
-
   try {
     const posts = await postsRepository.getPostsByHashtag(userId, hashtagId, page);
 
@@ -110,8 +106,6 @@ export async function getPostsByUserId(req, res) {
   const userId = res.locals.userId;
   const {page} = req.query
 
-  console.log(id)
-  console.log(page, "querrrrry")
   try {
     const posts = await postsRepository.getPostsByUserId(userId, id, page);
     const followStatus = await followRepository.getFollowStatus(userId, id);
@@ -215,10 +209,10 @@ export async function sharePost(req, res) {
 
 export async function countNewPosts(req, res) {
   const { timestamp } = req.params;
-  // const userId = res.locals.userId;
+  const userId = res.locals.userId;
 
   try {
-    const { rows } = await postsRepository.countNewPosts(timestamp)
+    const { rows } = await postsRepository.countNewPosts(timestamp, userId)
 
     res.status(200).send(rows[0]);
   } catch(err) { 
