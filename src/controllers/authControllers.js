@@ -1,14 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { insertUser } from "../repositories/authRepository.js";
+import authService from "../services/authService.js";
 
 export async function signUpController(req, res) {
   try {
     const { user_name, email, password, profile_picture } = req.user;
 
-    const newPassword = bcrypt.hashSync(password, 10);
-
-    insertUser(user_name, email, newPassword, profile_picture);
+    await authService.signUp(user_name, email, password, profile_picture)
 
     res.sendStatus(201);
   } catch (err) {

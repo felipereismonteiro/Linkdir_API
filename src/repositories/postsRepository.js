@@ -741,7 +741,7 @@ function sharePost(postId, userId) {
 }
 
 function countNewPosts(timestamp, userId) {
-  return connectionDB.query(`SELECT COUNT(*) AS new_posts FROM posts WHERE created_at > to_timestamp( $1, 'YYYY-MM-DD"T"HH24:MI:SS.MS' )`, [timestamp])
+  return connectionDB.query(`SELECT COUNT(*) AS new_posts FROM posts WHERE created_at > to_timestamp( $1, 'YYYY-MM-DD"T"HH24:MI:SS.MS' ) AND user_id !== $2`, [timestamp, userId])
 }
 
 const postsRepository = {
