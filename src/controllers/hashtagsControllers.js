@@ -1,10 +1,10 @@
-import hashtagsRepository from "../repositories/hashtagsRepository.js";
+import hashtagsService from "../services/hashtagsService.js";
 
 export async function getHashtags(req, res) {
   try {
-    const { rows } = await hashtagsRepository.getHashtags();
+    const rows = await hashtagsService.getHashtags();
     res.send(rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).send(err.message); 
   }
 }
