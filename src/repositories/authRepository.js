@@ -1,6 +1,6 @@
 import { connectionDB } from "../db/db.js";
 
-export async function insertUser(
+async function insertUser(
   user_name,
   email,
   newPassword,
@@ -16,12 +16,13 @@ export async function insertUser(
     }
 }
 
-export async function getUserById(id){
+async function getUserById(id){
   return connectionDB.query(`SELECT * FROM users WHERE id=$1`,[id])
 }
 
 const authRepository = {
+    insertUser,
     getUserById
-}
+} 
 
 export default authRepository;

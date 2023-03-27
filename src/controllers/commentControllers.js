@@ -1,10 +1,10 @@
-import commentsRepository from "../repositories/commentsRepository.js"
+import commentsService from "../services/commentsService.js";
 
 export default async function commentControllers(req, res) {
     try {
         const comment = res.comment;
 
-        await commentsRepository.postComment(comment);
+        await commentsService.postComment(comment);
 
         res.sendStatus(200);
     } catch(err) {

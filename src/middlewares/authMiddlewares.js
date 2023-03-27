@@ -35,22 +35,22 @@ export async function signInMiddleware(req, res, next) {
 
     await signInSchema.validateAsync(body, { abortEarly: false });
 
-    const founded = await connectionDB.query(
+    const found = await connectionDB.query(
       `SELECT * FROM users WHERE email=$1`,
       [body.email]
     );
 
-    if (founded.rows.length === 0) {
-      return res.status(404).send("User not founded");
+    if (found.rows.length === 0) {
+      return res.status(404).send("User not found");
     }
 
-    const { password } = founded.rows[0];
+    const { password } = found.rows[0];
 
     if (!bcrypt.compareSync(body.password, password)) {
       return res.sendStatus(401);
     }
 
-    req.user = founded.rows[0];
+    req.user = found.rows[0];
     next();
   } catch (err) {
     res.status(401).send(err.message);
